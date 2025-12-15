@@ -4,7 +4,7 @@
       <div class="keyboard-wrapper">
         <KeyboardPanel 
           :layout="K61_LAYOUT" 
-          :key-layout="deviceStore.keyLayout"
+          :key-layout="keyLayout"
           :key-colors="keyColors" 
           :selected-keys="selectedKeys"
           @key-click="handleKeyClick"
@@ -19,21 +19,32 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, watch } from 'vue';
+import { ref, reactive, computed, onMounted, watch } from 'vue';
 import { useDeviceStore } from '../../stores/device';
 import { useLightingStore } from '../../stores/lighting';
+import { useKeyboardStore } from '../../stores/keyboard';
 import { K61_LAYOUT } from '../../config/layout';
 import KeyboardPanel from './components/KeyboardPanel.vue';
 import SettingPanel from './components/SettingPanel.vue';
 
 const deviceStore = useDeviceStore();
 const lightingStore = useLightingStore();
+const keyboardStore = useKeyboardStore();
 
 const keyColors = reactive<Record<string, string>>({});
 const selectedKeys = ref<string[]>([]);
 
+// Layout computed from keyboardStore
+const keyLayout = computed(() => {
+  if (!keyboardStore.keyboard || keyboardStore.keyboard.length === 0) return [];
+  return keyboardStore.keyboard.map(row => row.map(k => k.keyValue[0]));
+});
+
 const loadConfig = async () => {
   if (deviceStore.connectedDevice) {
+    if (!keyboardStore.isInitialized) {
+      await keyboardStore.init();
+    }
     await lightingStore.readConfig();
   }
 };
@@ -60,7 +71,7 @@ const hexToRgb = (hex: string) => {
 const handleKeyClick = async (coords: { row: number, col: number }) => {
   if (!deviceStore.connectedDevice) return;
   
-  // 检查当前模式：只有 Static/Custom (mode 0) 才能设置单个键的 RGB
+  // Check Mode
   const currentMode = lightingStore.lightConfig.mode;
   if (currentMode !== 0) {
     deviceStore.addLog(`Cannot set key color in mode ${currentMode}. Please switch to Static/Custom mode first.`);
@@ -84,14 +95,13 @@ const applyColorToAll = async () => {
   const currentMode = lightingStore.lightConfig.mode;
   const rgb = hexToRgb(lightingStore.selectedColor);
 
-  // If Static/Custom Mode (0), use setRGB
   if (currentMode === 0) {
     const points: any[] = [];
     
-    // Iterate based on actual keyLayout matrix from device
-    deviceStore.keyLayout.forEach((row, rIndex) => {
-      row.forEach((keyValue, cIndex) => {
-        if (keyValue === 0) return; // Skip empty keys
+    // Iterate keyboardStore.keyboard instead of deviceStore.keyLayout
+    keyboardStore.keyboard.forEach((row, rIndex) => {
+      row.forEach((key, cIndex) => {
+        if (key.keyValue[0] === 0) return; // Skip empty keys
         points.push({
           position: { row: rIndex, col: cIndex },
           rgb: rgb
@@ -102,23 +112,15 @@ const applyColorToAll = async () => {
 
     await lightingStore.setRGB(points);
   } else {
-    // If Dynamic Mode, update Color Panel instead
-    // This allows changing color without changing the motion mode
-    
-    // Create a panel with the selected color repeated (typically 8 slots)
-    // We fill all slots to ensure consistency regardless of which slot the mode uses
+    // Dynamic Mode Logic
     const newPanel = Array(8).fill(rgb);
-    
     await lightingStore.setColorPanel(newPanel);
-    
-    // Also ensure we are using the first color slot
-    // Some modes might cycle through colors, but for single-color dynamic modes, this sets the base color
     await lightingStore.setColorID(0);
     
-    // Update local key colors just for visual feedback (optional)
-    deviceStore.keyLayout.forEach((row, rIndex) => {
-      row.forEach((keyValue, cIndex) => {
-        if (keyValue === 0) return;
+    // Visual feedback
+    keyboardStore.keyboard.forEach((row, rIndex) => {
+      row.forEach((key, cIndex) => {
+        if (key.keyValue[0] === 0) return;
         keyColors[`${rIndex},${cIndex}`] = lightingStore.selectedColor;
       });
     });

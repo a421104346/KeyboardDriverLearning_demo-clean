@@ -9,6 +9,7 @@
         :selected-keys="selectedKeys"
         :key-performance-data="keyPerformanceData"
         display-mode="performance"
+        @key-click="$emit('key-click', $event)"
       />
       <div v-else class="loading">
         Loading keyboard layout...
@@ -28,6 +29,8 @@ defineProps<{
   selectedKeys: string[];
   keyPerformanceData: any[][];
 }>();
+
+defineEmits(['key-click']);
 </script>
 
 <style scoped>
