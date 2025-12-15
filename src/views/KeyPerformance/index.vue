@@ -3,12 +3,13 @@
     <div class="content-wrapper">
       <div class="keyboard-wrapper">
         <KeyboardPanel 
-          :has-layout="deviceStore.keyLayout.length > 0"
+          :has-layout="isInitialized"
           :layout="K61_LAYOUT"
-          :key-layout="deviceStore.keyLayout" 
+          :key-layout="keyLayout" 
           :key-colors="activeKeyColors" 
-          :selected-keys="[]"
-          :key-performance-data="performanceStore.keyPerformanceData"
+          :selected-keys="keyboardStore.selectedKeyList"
+          :key-performance-data="keyboardStore.keyboard"
+          @key-click="handleKeyClick"
         />
       </div>
       
@@ -27,102 +28,72 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onUnmounted, onMounted, watch } from 'vue';
+import { ref, reactive, computed, watch, onMounted, onUnmounted } from 'vue';
 import { useDeviceStore } from '../../stores/device';
-import { useLightingStore } from '../../stores/lighting';
+import { useKeyboardStore } from '../../stores/keyboard';
 import { usePerformanceStore } from '../../stores/performance';
+import { useLightingStore } from '../../stores/lighting';
 import { K61_LAYOUT } from '../../config/layout';
 import service from '../../service';
 import KeyboardPanel from './components/KeyboardPanel.vue';
 import SettingPanel from './components/SettingPanel.vue';
 
 const deviceStore = useDeviceStore();
-const lightingStore = useLightingStore();
+const keyboardStore = useKeyboardStore();
 const performanceStore = usePerformanceStore();
+const lightingStore = useLightingStore();
 
 const isTesting = ref(false);
 const maxTravel = ref(0);
 const activeKeyColors = reactive<Record<string, string>>({});
-const lastTriggered = ref<{row: number, col: number} | null>(null);
 let timer: number | null = null;
-const hasLoadedConfig = ref(false);
 
-// Load config when keyLayout is ready
-const loadPerformanceConfig = async () => {
-  // Only load if device is connected and keyLayout is loaded
-  if (!deviceStore.connectedDevice || !deviceStore.keyLayout || deviceStore.keyLayout.length === 0) {
-    return;
-  }
-  
-  // Prevent duplicate loading (only if already successfully loaded)
-  if (hasLoadedConfig.value && performanceStore.isLoaded) {
-    return;
-  }
-  
-  try {
-    await performanceStore.readConfig();
-    // Only mark as loaded if readConfig succeeded (isLoaded will be set by the store)
-    if (performanceStore.isLoaded) {
-      hasLoadedConfig.value = true;
-      console.log('[KeyPerformance] Config loaded in view:', performanceStore.config);
-      // Load all keys' performance data for display
-      await performanceStore.readAllKeysPerformance();
-    } else {
-      console.warn('[KeyPerformance] readConfig did not set isLoaded=true');
+// Derived State
+const isInitialized = computed(() => keyboardStore.isInitialized);
+
+// Map KeyData[][] to number[][] for Keyboard component compatibility
+const keyLayout = computed(() => {
+  if (!keyboardStore.keyboard || keyboardStore.keyboard.length === 0) return [];
+  return keyboardStore.keyboard.map(row => row.map(k => k.keyValue[0]));
+});
+
+// Initialization Logic
+const initData = async () => {
+  if (deviceStore.connectedDevice) {
+    if (!keyboardStore.isInitialized) {
+      await keyboardStore.init();
     }
-  } catch (e) {
-    console.error('Failed to load performance config:', e);
-    hasLoadedConfig.value = false; // Reset on error
+    // Select all keys by default if none selected
+    if (keyboardStore.selectedKeyList.length === 0) {
+       keyboardStore.selectAll();
+    }
+    performanceStore.readConfigFromSelection();
   }
 };
 
-// Watch config changes for debugging
-watch(
-  () => performanceStore.config.travel,
-  (newVal) => {
-    console.log('[KeyPerformance] Config.travel changed to:', newVal);
-  },
-  { immediate: true }
-);
+onMounted(initData);
 
-// Watch for keyLayout changes (when device connects)
-watch(
-  () => [deviceStore.connectedDevice, deviceStore.keyLayout],
-  ([connected, layout]) => {
-    // Reset flag when device disconnects
-    if (!connected) {
-      hasLoadedConfig.value = false;
-      return;
-    }
-    
-    // Load when device is connected and layout is ready
-    if (connected && layout && (layout as number[][]).length > 0) {
-      loadPerformanceConfig();
-    }
-  },
-  { immediate: true }
-);
-
-// Also try to load on mount if already connected
-onMounted(async () => {
-  await loadPerformanceConfig();
+watch(() => deviceStore.connectedDevice, (connected) => {
+  if (connected) initData();
 });
+
+const handleKeyClick = ({ row, col }: { row: number, col: number }) => {
+  // Toggle selection (multi-select behavior)
+  keyboardStore.selectKey(row, col, true);
+  performanceStore.readConfigFromSelection();
+};
 
 const applyConfig = async () => {
   await performanceStore.applyConfig();
 };
 
+// Test Mode Logic (Reused)
 const toggleTest = async (e: Event) => {
   const checked = (e.target as HTMLInputElement).checked;
   isTesting.value = checked;
-  
-  // Immediately blur to prevent Space key from re-toggling
   (e.target as HTMLInputElement).blur();
   
   if (checked) {
-    // Don't call service.startAdjusting() - that's for calibration mode
-    // which triggers firmware LED takeover.
-    // Just start polling directly for key press testing.
     startPolling();
   } else {
     stopPolling();
@@ -132,7 +103,6 @@ const toggleTest = async (e: Event) => {
 const startPolling = () => {
   if (timer) clearInterval(timer);
   
-  // Use detected rows/cols or default
   const rows = lightingStore.lightAreas[0]?.row || deviceStore.deviceInfo?.row || 5;
   const cols = lightingStore.lightAreas[0]?.col || deviceStore.deviceInfo?.col || 14;
 
@@ -145,14 +115,13 @@ const startPolling = () => {
       let maxRow = -1;
       let maxCol = -1;
       
-      // Only update keys that are valid in the layout (keyValue != 0)
       travelData.forEach((rowVals, rIndex) => {
         rowVals.forEach((val, cIndex) => {
           const keyId = `${rIndex},${cIndex}`;
           
-          // Check if this key is valid in the layout
-          const isValidKey = deviceStore.keyLayout?.[rIndex]?.[cIndex] !== 0;
-          if (!isValidKey) return; // Skip empty keys
+          // Check if valid key in keyboard store
+          const key = keyboardStore.keyboard[rIndex]?.[cIndex];
+          if (!key || key.keyValue[0] === 0) return;
           
           if (val > currentMax) {
             currentMax = val;
@@ -160,15 +129,9 @@ const startPolling = () => {
             maxCol = cIndex;
           }
           
-          // Color logic:
-          // Triggered (triggerData[r][c] > 0): Green
-          // Pressed (val > 0.1): Blue scale
-          
           if (triggerData[rIndex] && triggerData[rIndex][cIndex] > 0) {
-             activeKeyColors[keyId] = '#00ff00'; // Triggered
-             lastTriggered.value = { row: rIndex, col: cIndex };
+             activeKeyColors[keyId] = '#00ff00'; 
           } else if (val > 0.2) {
-             // Calculate opacity based on travel
              const opacity = Math.min(val / 2.0, 1);
              activeKeyColors[keyId] = `rgba(0, 100, 255, ${opacity})`;
           } else {
@@ -178,9 +141,6 @@ const startPolling = () => {
       });
       
       maxTravel.value = currentMax;
-      if (maxRow >= 0 && maxCol >= 0) {
-        console.log(`Max travel at (${maxRow},${maxCol}): ${currentMax.toFixed(2)}mm`);
-      }
       
     } catch (e) {
       console.error(e);
@@ -234,10 +194,12 @@ onUnmounted(() => {
 
 .setting-wrapper {
   flex: 1;
-  background: #fff;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  /* background: #fff; */ /* Moved to SettingPanel content */
+  /* border-radius: 12px; */
+  /* overflow: hidden; */ 
+  /* box-shadow: 0 4px 12px rgba(0,0,0,0.05); */
   min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 </style>
