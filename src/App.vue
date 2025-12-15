@@ -5,7 +5,7 @@
       
       <nav v-if="deviceStore.connectedDevice" class="nav-menu">
         <router-link to="/lighting" class="nav-item" active-class="active">Lighting</router-link>
-        <router-link to="/keytest" class="nav-item" active-class="active">Key Test</router-link>
+        <router-link to="/keyperformance" class="nav-item" active-class="active">Key Performance</router-link>
       </nav>
 
       <div class="connection-status">
@@ -14,9 +14,23 @@
       </div>
     </header>
 
-    <main class="main-content" v-if="deviceStore.connectedDevice">
+    <template v-if="deviceStore.connectedDevice">
+      <main class="main-content">
         <router-view></router-view>
-    </main>
+      </main>
+
+      <!-- Logs Panel - Always visible when device is connected -->
+      <div class="logs-panel">
+        <div class="logs-header">
+          <span>Device Logs</span>
+          <button @click="toggleLogs" class="btn-toggle-logs">{{ logsExpanded ? '−' : '+' }}</button>
+        </div>
+        <div v-if="logsExpanded" class="logs-content">
+          <div v-for="(log, i) in deviceStore.logs" :key="i" class="log-line">{{ log }}</div>
+          <div v-if="deviceStore.logs.length === 0" class="log-empty">No logs yet...</div>
+        </div>
+      </div>
+    </template>
 
     <div v-else class="welcome-screen">
       <div class="mascot-container">
@@ -31,6 +45,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
 import { useDeviceStore } from './stores/device';
 import { useLightingStore } from './stores/lighting';
 // DeviceModal removed
@@ -38,6 +53,7 @@ import type { Device } from './stores/device';
 
 const deviceStore = useDeviceStore();
 const lightingStore = useLightingStore();
+const logsExpanded = ref(true);
 
 // const showModal = ref(false); // No longer needed
 
@@ -59,6 +75,10 @@ const handleConnect = async (device: Device) => {
   if (success) {
     await lightingStore.readConfig();
   }
+};
+
+const toggleLogs = () => {
+  logsExpanded.value = !logsExpanded.value;
 };
 </script>
 
@@ -148,6 +168,8 @@ button {
   flex: 1;
   display: flex;
   overflow: hidden;
+  min-height: 0; /* Allow flex shrinking */
+  position: relative;
 }
 
 .welcome-screen {
@@ -192,5 +214,66 @@ button {
   border-color: #666;
   transform: translateY(-2px);
   box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+}
+
+/* Logs Panel - At bottom of flex container */
+.logs-panel {
+  background: #1a1a1a;
+  border-top: 1px solid #333;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  max-height: 300px;
+}
+
+.logs-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  background: #252525;
+  border-bottom: 1px solid #333;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ccc;
+}
+
+.btn-toggle-logs {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  line-height: 1;
+  min-width: 24px;
+}
+
+.btn-toggle-logs:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.logs-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 16px;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.75rem;
+  color: #0f0;
+  background: #000;
+  max-height: 250px;
+}
+
+.log-line {
+  margin: 2px 0;
+  word-break: break-all;
+}
+
+.log-empty {
+  color: #666;
+  font-style: italic;
+  text-align: center;
+  padding: 20px;
 }
 </style>

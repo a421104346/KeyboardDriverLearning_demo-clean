@@ -1,11 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Lighting from '../views/Lighting.vue';
-import KeyTest from '../views/KeyTest.vue';
+import Lighting from '../views/Lighting/index.vue';
+import KeyPerformance from '../views/KeyPerformance/index.vue';
 
 const routes = [
   { path: '/', redirect: '/lighting' },
   { path: '/lighting', component: Lighting },
-  { path: '/keytest', component: KeyTest }
+  { path: '/keyperformance', component: KeyPerformance }
 ];
 
 const router = createRouter({

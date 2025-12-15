@@ -12,6 +12,20 @@
           >
             <div class="key-cap" :style="{ backgroundColor: getKeyColor(rowIndex, colIndex) }">
               <div class="key-legend">{{ getLabel(rowIndex, colIndex) }}</div>
+              
+              <!-- Performance Mode: Show trigger values -->
+              <div v-if="displayMode === 'performance' && keyPerformanceData" class="performance-overlay">
+                <!-- Top-left: Trigger Point -->
+                <div class="perf-value top-left">
+                  {{ getPerformanceValue(rowIndex, colIndex, 'travel') }}
+                </div>
+                
+                <!-- Bottom: RT values (if RT enabled) -->
+                <div v-if="getPerformanceValue(rowIndex, colIndex, 'isRT')" class="perf-value bottom">
+                  <span class="rt-press">{{ getPerformanceValue(rowIndex, colIndex, 'rtPress') }}</span>
+                  <span class="rt-release">{{ getPerformanceValue(rowIndex, colIndex, 'rtRelease') }}</span>
+                </div>
+              </div>
             </div>
           </div>
         </template>
@@ -29,6 +43,8 @@ const props = defineProps<{
   keyLayout: number[][]; // Matrix from device (keyValue)
   keyColors: Record<string, string>; 
   selectedKeys: string[];
+  keyPerformanceData?: any[][]; // Optional: performance data for each key
+  displayMode?: string; // 'normal' | 'performance'
 }>();
 
 const emit = defineEmits(['key-click']);
@@ -63,6 +79,17 @@ const getLabel = (row: number, col: number) => {
 
 const handleKeyClick = (row: number, col: number) => {
   emit('key-click', { row, col });
+};
+
+const getPerformanceValue = (row: number, col: number, field: string) => {
+  if (!props.keyPerformanceData) return '';
+  const data = props.keyPerformanceData[row]?.[col];
+  if (!data) return '';
+  
+  const value = data[field];
+  if (field === 'isRT') return value; // boolean
+  if (typeof value === 'number') return value.toFixed(1);
+  return '';
 };
 </script>
 
@@ -127,5 +154,45 @@ const handleKeyClick = (row: number, col: number) => {
 
 .key-unit:hover .key-cap {
   filter: brightness(1.2);
+}
+
+/* Performance Overlay */
+.performance-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.perf-value {
+  position: absolute;
+  padding: 2px 4px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 3px;
+}
+
+.perf-value.top-left {
+  top: 2px;
+  left: 2px;
+  color: #4CAF50;
+}
+
+.perf-value.bottom {
+  bottom: 2px;
+  left: 2px;
+  right: 2px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+}
+
+.rt-press {
+  color: #2196F3;
+}
+
+.rt-release {
+  color: #FF9800;
 }
 </style>
