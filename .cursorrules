@@ -1,0 +1,36 @@
+# Project Rules
+
+## Tech Stack
+- Framework: Vue 3
+- Build Tool: Vite
+- Language: TypeScript
+- Device Communication: WebHID (via HSDK)
+
+## Code Style
+- Use `<script setup lang="ts">` (Composition API).
+- Use SCSS for styling.
+- Store management: Pinia (if needed, or simple reactive state for demo).
+
+## Device Communication
+- The project relies on `HSDK` for HID communication.
+- `HSDK` is provided as a pre-compiled JS module.
+- Connection flow:
+  1. `service.getDevices()` to list/connect.
+  2. `service.connectDevice(deviceId)` to connect.
+  3. `service.setLightAreaRGB(areaId, rgbData)` to control lights.
+
+## Directory Structure
+- `src/sdk/`: Contains the HSDK library.
+- `src/components/`: UI components.
+- `src/views/`: Main views.
+
+## Key Information from H-Hub
+- Vendor ID: 0x34b7
+- Product ID: 0xffff
+- Usage Page: 0xff00
+- Usage: 0x01
+- Main Light Protocol:
+  - CMD_LED_CONTROL: 0x31
+  - SUB_RGB: 0x04
+  - Packet size: 64 bytes
+

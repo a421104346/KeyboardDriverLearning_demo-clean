@@ -1,0 +1,112 @@
+export declare const PACK_HEAD_COM_UUID = 0;
+export declare enum Command {
+    CMD_SYS_SYNC = 1,
+    CMD_SYS_DEV_REBOOT = 2,
+    CMD_SYS_DEV_FACTORY = 3,
+    CMD_SYS_RST_FUNC = 4,
+    CMD_FW_UPDATE = 16,
+    CMD_FW_CHECK = 17,
+    CMD_DEV_QUERY = 32,
+    CMD_DEV_DEFINE = 33,
+    CMD_DEV_MACRO = 34,
+    CMD_DEV_PROPERTY = 35,
+    CMD_LED_QUERY = 48,
+    CMD_LED_CONTROL = 49,
+    CMD_FUNC_PARAM = 64
+}
+export declare enum ReadWriteType {
+    READ_TYPE = 0,
+    WRITE_TYPE = 1
+}
+export declare enum RebootType {
+    REBOOT_TYPE_BOOT = 0,
+    REBOOT_TYPE_APP = 1
+}
+export declare enum Profile {
+    PROFILE_1 = 1,
+    PROFILE_2 = 2,
+    PROFILE_3 = 4,
+    PROFILE_4 = 8
+}
+export declare enum LightQueryCommand {
+    LIGHT_QUERY_COMMAND_AREA = 0
+}
+export declare enum LightAreaType {
+    LIGHT_AREA_MAIN_RGB_DOWN = 0,
+    LIGHT_AREA_MAIN_RGB_UP = 1,
+    LIGHT_AREA_2 = 2,
+    LIGHT_AREA_3 = 3,
+    LIGHT_AREA_4 = 4,
+    LIGHT_AREA_5 = 5,
+    LIGHT_AREA_6 = 6,
+    LIGHT_AREA_7 = 7
+}
+export declare enum LightControlSubCommand {
+    LIGHT_CONTROL_SUB_CONFIG = 1,
+    LIGHT_CONTROL_SUB_COLOR_ID = 2,
+    LIGHT_CONTROL_SUB_COLOR_PANEL = 3,
+    LIGHT_CONTROL_SUB_RGB = 4
+}
+export declare enum LightQueryRGBMode {
+    LIGHT_SINGLE_QUERY_MODE_CUSTOM = 0,
+    LIGHT_SINGLE_QUERY_MODE_DYNAMIC = 1
+}
+export declare enum DeviceQuerySubCommand {
+    DEVICE_QUERY_SUB_LAYOUT = 1,
+    DEVICE_QUERY_SUB_PERFORMANCE = 17,
+    DEVICE_QUERY_SUB_SUPPORT_AXIS = 18
+}
+export declare enum KeyControlSubCommand {
+    KEY_CONTROL_SUB_DELETE_ADVANCED = 0,
+    KEY_CONTROL_SUB_SET_NORMAL = 64,
+    KEY_CONTROL_SUB_SET_ENCAPSULATED = 192,
+    KEY_CONTROL_SUB_SET_COMBINED = 208,
+    KEY_CONTROL_SUB_SET_DKS = 227,
+    KEY_CONTROL_SUB_SET_MPT = 228,
+    KEY_CONTROL_SUB_SET_MT = 230,
+    KEY_CONTROL_SUB_SET_TGL = 231,
+    KEY_CONTROL_SUB_SET_END = 232,
+    KEY_CONTROL_SUB_SET_SOCD = 234,
+    KEY_CONTROL_SUB_SET_WEB = 235
+}
+export declare enum KeyPerformanceSubCommand {
+    KEY_PERFORMANCE_SUB_GET_ADC = 1,
+    KEY_PERFORMANCE_SUB_GET_ADC_FINAL = 2,
+    KEY_PERFORMANCE_SUB_GET_ADC_MAX = 3,
+    KEY_PERFORMANCE_SUB_GET_ADC_MIN = 4,
+    KEY_PERFORMANCE_SUB_GET_TRAVEL_REAL_TIME = 5,
+    KEY_PERFORMANCE_SUB_GET_ADJUSTING_SUCCESS = 6,
+    KEY_PERFORMANCE_SUB_GET_KEY_TRIGGER_STATE = 7,
+    KEY_PERFORMANCE_SUB_KEY_INFO = 17
+}
+export declare enum FuncParamSubCommand {
+    FUNC_PARAM_SUB_ADJUSTING = 1,
+    FUNC_PARAM_SUB_WIN_LOCK = 33,
+    FUNC_PARAM_SUB_ALL_KEY_LOCK = 34,
+    FUNC_PARAM_SUB_RT_SWITCH = 35,
+    FUNC_PARAM_SUB_REPORT_RATE = 65,
+    FUNC_PARAM_SUB_CONFIG = 66,
+    FUNC_PARAM_SUB_SYSTEM = 67
+}
+export declare enum AdjustingSubCommand {
+    ADJUSTING_SUB_FINISH = 0,
+    ADJUSTING_SUB_START = 1
+}
+export declare enum LockWinSubCommand {
+    LOCK_WIN_SUB_UNLOCK = 0,
+    LOCK_WIN_SUB_LOCK = 1
+}
+export declare enum AllKeyLockSubCommand {
+    ALL_KEY_LOCK_SUB_UNLOCK = 0,
+    ALL_KEY_LOCK_SUB_LOCK = 1
+}
+export declare enum RT_SWITCH_SUB_Command {
+    RT_SWITCH_SUB_CLOSE = 0,
+    RT_SWITCH_SUB_OPEN = 1
+}
+export declare enum ReportProactivelySubCommand {
+    REPORT_PROACTIVELY_SUB_LIGHT = "REPORT_PROACTIVELY_SUB_LIGHT",
+    REPORT_PROACTIVELY_SUB_COLOR_PANEL_ID = "REPORT_PROACTIVELY_SUB_COLOR_PANEL_ID",
+    REPORT_PROACTIVELY_SUB_CONFIG = "REPORT_PROACTIVELY_SUB_CONFIG",
+    REPORT_PROACTIVELY_SUB_SYSTEM = "REPORT_PROACTIVELY_SUB_SYSTEM"
+}

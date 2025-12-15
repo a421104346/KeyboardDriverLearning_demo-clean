@@ -1,0 +1,33 @@
+# Node
+node_modules/
+dist/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Build
+dist-ssr
+*.local
+
+# Temp
+.temp
+.cache
+
