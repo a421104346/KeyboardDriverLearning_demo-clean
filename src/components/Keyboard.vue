@@ -11,7 +11,18 @@
             @click="handleKeyClick(rowIndex, colIndex)"
           >
             <div class="key-cap" :style="{ backgroundColor: getKeyColor(rowIndex, colIndex) }">
-              <div class="key-legend">{{ getLabel(rowIndex, colIndex) }}</div>
+              <!-- Custom Content Support -->
+              <template v-if="getCustomContent(rowIndex, colIndex)">
+                <img 
+                  v-if="getCustomContent(rowIndex, colIndex)?.type === 'icon'" 
+                  :src="getCustomContent(rowIndex, colIndex)?.value" 
+                  class="custom-icon"
+                />
+                <div v-else class="key-legend">{{ getCustomContent(rowIndex, colIndex)?.value }}</div>
+              </template>
+              
+              <!-- Standard Label Fallback -->
+              <div v-else class="key-legend">{{ getLabel(rowIndex, colIndex) }}</div>
               
               <!-- Performance Mode: Show trigger values -->
               <div v-if="displayMode === 'performance' && keyPerformanceData" class="performance-overlay">
@@ -45,6 +56,7 @@ const props = defineProps<{
   selectedKeys: string[];
   keyPerformanceData?: any[][]; // Optional: performance data for each key
   displayMode?: string; // 'normal' | 'performance'
+  customContent?: Record<string, { type: 'text' | 'icon', value: string }>; // New prop
 }>();
 
 const emit = defineEmits(['key-click']);
@@ -69,6 +81,11 @@ const getKeyColor = (row: number, col: number) => {
 const isSelected = (row: number, col: number) => {
   const keyId = `${row},${col}`;
   return props.selectedKeys.includes(keyId);
+};
+
+const getCustomContent = (row: number, col: number) => {
+  if (!props.customContent) return null;
+  return props.customContent[`${row},${col}`];
 };
 
 const getLabel = (row: number, col: number) => {
@@ -145,6 +162,17 @@ const getPerformanceValue = (row: number, col: number, field: string) => {
 
 .key-legend {
   font-size: 14px;
+}
+
+.custom-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  /* Make icons white for dark keycaps. 
+     brightness(0) turns it black, invert(1) turns it white. 
+     This ensures consistency regardless of original SVG color. */
+  filter: brightness(0) invert(1);
+  opacity: 0.9;
 }
 
 .key-selected .key-cap {

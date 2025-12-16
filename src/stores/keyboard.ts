@@ -74,6 +74,9 @@ export const useKeyboardStore = defineStore('keyboard', () => {
     let count = 0;
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
+        // Safety check to prevent "Cannot read properties of undefined" errors
+        if (!keyboard.value[r] || !keyboard.value[r][c]) continue;
+
         // Skip empty keys to save time and API calls
         if (keyboard.value[r][c].keyValue[0] === 0) continue;
 

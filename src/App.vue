@@ -4,8 +4,14 @@
       <div class="logo">H-Hub Web Demo</div>
       
       <nav v-if="deviceStore.connectedDevice" class="nav-menu">
-        <router-link to="/lighting" class="nav-item" active-class="active">Lighting</router-link>
         <router-link to="/keyperformance" class="nav-item" active-class="active">Key Performance</router-link>
+        <router-link to="/keyassignment" class="nav-item" active-class="active">Key Assignment</router-link>
+        <router-link to="/advancedkeys" class="nav-item" active-class="active">Advanced Keys</router-link>
+        <router-link to="/lighting" class="nav-item" active-class="active">Lighting</router-link>
+        <router-link to="/macros" class="nav-item" active-class="active">Macros</router-link>
+        <router-link to="/system" class="nav-item" active-class="active">System</router-link>
+        <router-link to="/configurations" class="nav-item" active-class="active">Configs</router-link>
+        <router-link to="/firmware" class="nav-item" active-class="active">Firmware</router-link>
       </nav>
 
       <div class="connection-status">
@@ -45,15 +51,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import { useDeviceStore } from './stores/device';
 import { useLightingStore } from './stores/lighting';
 // DeviceModal removed
 import type { Device } from './stores/device';
 
+const router = useRouter();
 const deviceStore = useDeviceStore();
 const lightingStore = useLightingStore();
 const logsExpanded = ref(true);
+
+// Watch for device connection changes
+watch(() => deviceStore.connectedDevice, (newDevice) => {
+  if (newDevice) {
+    router.push('/keyperformance');
+  }
+});
 
 // const showModal = ref(false); // No longer needed
 
