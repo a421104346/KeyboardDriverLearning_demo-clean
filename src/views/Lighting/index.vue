@@ -41,7 +41,7 @@ const keyLayout = computed(() => {
 });
 
 const loadConfig = async () => {
-  if (deviceStore.connectedDevice) {
+  if (deviceStore.currentDevice) {
     if (!keyboardStore.isInitialized) {
       await keyboardStore.init();
     }
@@ -53,7 +53,7 @@ onMounted(() => {
   loadConfig();
 });
 
-watch(() => deviceStore.connectedDevice, (newDevice) => {
+watch(() => deviceStore.currentDevice, (newDevice) => {
   if (newDevice) {
     loadConfig();
   }
@@ -69,7 +69,7 @@ const hexToRgb = (hex: string) => {
 };
 
 const handleKeyClick = async (coords: { row: number, col: number }) => {
-  if (!deviceStore.connectedDevice) return;
+  if (!deviceStore.currentDevice) return;
   
   // Check Mode
   const currentMode = lightingStore.lightConfig.mode;
@@ -90,7 +90,7 @@ const handleKeyClick = async (coords: { row: number, col: number }) => {
 };
 
 const applyColorToAll = async () => {
-  if (!deviceStore.connectedDevice) return;
+  if (!deviceStore.currentDevice) return;
   
   const currentMode = lightingStore.lightConfig.mode;
   const rgb = hexToRgb(lightingStore.selectedColor);

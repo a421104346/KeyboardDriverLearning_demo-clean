@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import service from '../service';
+import { hHubClient } from '../service/HHubClient';
 import { useDeviceStore } from './device';
+import { asyncThrottle } from '../utils/throttle';
 
 // Import layouts
 import k61 from '../assets/layouts/k61.json';
@@ -39,8 +40,20 @@ export const useLightingStore = defineStore('lighting', () => {
   const lightAreas = ref<any[]>([]);
   const currentLayout = ref<any[]>(k61.layout);
 
+  // Throttled Send Functions
+  const sendConfig = asyncThrottle(async (config: any) => {
+    await hHubClient.setLightConfigInfo(config);
+    deviceStore.addLog('Config updated (throttled).');
+  }, 100);
+
+  const sendColorPanel = asyncThrottle(async (areaId: number, colors: any[]) => {
+    await hHubClient.setColorPanel(areaId, colors);
+    deviceStore.addLog('Color panel updated (throttled).');
+  }, 100);
+
+
   const loadLayout = () => {
-     const layoutID = deviceStore.connectedDevice?.info?.layoutID;
+     const layoutID = deviceStore.deviceInfo?.layoutID;
      let data: any = k61;
      
      if (layoutID === 4) data = k84;
@@ -54,7 +67,7 @@ export const useLightingStore = defineStore('lighting', () => {
   // 初始化灯光区域（参考 H-Hub）
   const initLightArea = async () => {
     try {
-      const areas = await service.getLightArea();
+      const areas = await hHubClient.getLightArea();
       if (!areas || areas.length === 0) {
         deviceStore.addLog('No light areas found');
         return;
@@ -67,16 +80,16 @@ export const useLightingStore = defineStore('lighting', () => {
         const lightAreaInfo = areas[i];
         if (!lightAreaInfo) continue;
 
-        const config = await service.getLightConfigInfo(lightAreaInfo.areaID);
+        const config = await hHubClient.getLightConfigInfo(lightAreaInfo.areaID);
         
         // 获取调色盘
-        const colorPanel = await service.getColorPanel(lightAreaInfo.areaID);
+        const colorPanel = await hHubClient.getColorPanel(lightAreaInfo.areaID);
         const colorPanelHex = colorPanel.colorList.map((item: any) => {
           return `#${item.r.toString(16).padStart(2, '0')}${item.g.toString(16).padStart(2, '0')}${item.b.toString(16).padStart(2, '0')}`;
         });
 
         // 获取当前 colorID
-        const colorIDResult = await service.getColorID(lightAreaInfo.areaID);
+        const colorIDResult = await hHubClient.getColorID(lightAreaInfo.areaID);
 
         // 初始化 RGB 矩阵
         const lightAreaRGB: any[][] = Array.from(
@@ -124,15 +137,18 @@ export const useLightingStore = defineStore('lighting', () => {
         newConfig = { ...newConfig, mode: area.lightConfig.mode };
       }
 
+      // Optimistic update
       area.lightConfig = { ...area.lightConfig, ...newConfig };
-      await service.setLightConfigInfo(area.lightConfig);
-      deviceStore.addLog('Config updated.');
+      
+      // Send throttled
+      sendConfig(area.lightConfig);
     } catch (e: any) {
       deviceStore.addLog(`Config update error: ${e.message}`);
     }
   };
 
   // 设置 RGB（只在 Static/Custom 模式下有效）
+  // Not throttled to prevent dropping points during rapid interactions
   const setRGB = async (points: any[]) => {
     try {
       const area = lightConfigs.value.find(a => a.lightAreaInfo?.areaID === currentLightArea.value);
@@ -153,7 +169,8 @@ export const useLightingStore = defineStore('lighting', () => {
         await updateConfig({ open: true }, true);
       }
 
-      await service.setLightAreaRGB(currentLightArea.value, points);
+      // Direct send for responsiveness on single clicks/drags
+      await hHubClient.setLightAreaRGB(currentLightArea.value, points);
       
       // 更新本地 RGB 数据
       points.forEach((point: any) => {
@@ -162,7 +179,7 @@ export const useLightingStore = defineStore('lighting', () => {
         }
       });
       
-      deviceStore.addLog(`RGB set for ${points.length} points`);
+      // deviceStore.addLog(`RGB set for ${points.length} points`); // Too spammy if not throttled
     } catch (e: any) {
       deviceStore.addLog(`RGB error: ${e.message}`);
     }
@@ -174,14 +191,13 @@ export const useLightingStore = defineStore('lighting', () => {
       const area = lightConfigs.value.find(a => a.lightAreaInfo?.areaID === currentLightArea.value);
       if (!area) return;
 
-      await service.setColorPanel(currentLightArea.value, colors);
-      
-      // 更新本地调色盘
+      // Optimistic update
       area.colorPanelHex = colors.map(c => {
         return `#${c.r.toString(16).padStart(2, '0')}${c.g.toString(16).padStart(2, '0')}${c.b.toString(16).padStart(2, '0')}`;
       });
-      
-      deviceStore.addLog('Color panel updated');
+
+      // Send throttled
+      sendColorPanel(currentLightArea.value, colors);
     } catch (e: any) {
       deviceStore.addLog(`Set color panel error: ${e.message}`);
     }
@@ -193,7 +209,7 @@ export const useLightingStore = defineStore('lighting', () => {
       const area = lightConfigs.value.find(a => a.lightAreaInfo?.areaID === currentLightArea.value);
       if (!area) return;
 
-      await service.setColorID(currentLightArea.value, id);
+      await hHubClient.setColorID(currentLightArea.value, id);
       area.colorID = id;
       deviceStore.addLog(`ColorID set to ${id}`);
     } catch (e: any) {

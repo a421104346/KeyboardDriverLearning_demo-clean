@@ -3,8 +3,9 @@
     <header class="header">
       <div class="logo">H-Hub Web Demo</div>
       
-      <nav v-if="deviceStore.connectedDevice" class="nav-menu">
+      <nav v-if="deviceStore.currentDevice" class="nav-menu">
         <router-link to="/keyperformance" class="nav-item" active-class="active">Key Performance</router-link>
+        <router-link to="/keytest" class="nav-item" active-class="active">Key Test</router-link>
         <router-link to="/keyassignment" class="nav-item" active-class="active">Key Assignment</router-link>
         <router-link to="/advancedkeys" class="nav-item" active-class="active">Advanced Keys</router-link>
         <router-link to="/lighting" class="nav-item" active-class="active">Lighting</router-link>
@@ -15,12 +16,14 @@
       </nav>
 
       <div class="connection-status">
-        <span v-if="deviceStore.connectedDevice" class="status-connected">● {{ deviceStore.connectedDevice.label }}</span>
-        <button v-if="deviceStore.connectedDevice" @click="deviceStore.disconnect()" class="btn-disconnect">Disconnect</button>
+        <span v-if="deviceStore.currentDevice" class="status-connected">● {{ deviceStore.currentDevice.name }}</span>
+        <button v-if="deviceStore.currentDevice" @click="deviceStore.disconnect()" class="btn-disconnect">Disconnect</button>
       </div>
     </header>
 
-    <template v-if="deviceStore.connectedDevice">
+    <ErrorAlert v-if="errorStore.errors.length > 0" />
+
+    <template v-if="deviceStore.currentDevice">
       <main class="main-content">
         <router-view></router-view>
       </main>
@@ -55,16 +58,19 @@ import { ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useDeviceStore } from './stores/device';
 import { useLightingStore } from './stores/lighting';
+import { useErrorStore } from './stores/error';
 // DeviceModal removed
-import type { Device } from './stores/device';
+import type { HHubDeviceInfo } from './types/device';
+import ErrorAlert from './components/common/ErrorAlert.vue';
 
 const router = useRouter();
 const deviceStore = useDeviceStore();
 const lightingStore = useLightingStore();
+const errorStore = useErrorStore();
 const logsExpanded = ref(true);
 
 // Watch for device connection changes
-watch(() => deviceStore.connectedDevice, (newDevice) => {
+watch(() => deviceStore.currentDevice, (newDevice) => {
   if (newDevice) {
     router.push('/keyperformance');
   }
@@ -85,9 +91,10 @@ const openScanModal = async () => {
   }
 };
 
-const handleConnect = async (device: Device) => {
-  const success = await deviceStore.connect(device.deviceId);
-  if (success) {
+const handleConnect = async (device: HHubDeviceInfo) => {
+  // Pass device ID to connect
+  await deviceStore.connect(device.id);
+  if (deviceStore.isConnected) {
     await lightingStore.readConfig();
   }
 };

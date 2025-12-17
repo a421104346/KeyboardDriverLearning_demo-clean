@@ -1,131 +1,165 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
-import service from '../service';
-import type { DeviceInfo } from '../sdk/protocol/types/interface';
-
-export interface Device {
-  deviceId: string;
-  label: string;
-  info?: DeviceInfo;
-}
+import { ref, computed } from 'vue';
+import { hHubClient } from '../service/HHubClient';
+import type { DeviceConnectionState, HHubDeviceInfo } from '../types/device';
+import { ErrorCode } from '../types/error';
+import { useErrorStore } from './error'; // We'll create this next, but can reference it now
 
 export const useDeviceStore = defineStore('device', () => {
-  const connectedDevice = ref<Device | null>(null);
-  const scannedDevices = ref<Device[]>([]);
-  const isScanning = ref(false);
+  // State Machine
+  const state = ref<DeviceConnectionState>('idle');
+  const currentDevice = ref<HHubDeviceInfo | null>(null);
+  const scannedDevices = ref<HHubDeviceInfo[]>([]);
+  const error = ref<string | null>(null);
   const logs = ref<string[]>([]);
-  
-  // Device details
+
+  // Device Details (cached after connection)
   const deviceInfo = ref<any>(null);
   const keyLayout = ref<number[][]>([]);
   const supportedAxes = ref<any>(null);
 
+  // Getters
+  const isConnecting = computed(() => state.value === 'connecting');
+  const isConnected = computed(() => state.value === 'connected');
+  const canConnect = computed(() => ['idle', 'authorized', 'error'].includes(state.value));
+
+  // Helper
   const addLog = (msg: string) => {
     logs.value.unshift(`${new Date().toLocaleTimeString()} - ${msg}`);
+    console.log(`[DeviceStore] ${msg}`);
   };
 
-  const scan = async () => {
-    isScanning.value = true;
-    try {
-      const result = await service.getDevices();
-      scannedDevices.value = result.map((d: any) => ({
-        deviceId: d.productId || d.device?.productId,
-        label: d.productName || d.device?.productName || 'Unknown Device'
-      }));
-    } catch (e: any) {
-      addLog(`Scan error: ${e.message}`);
-    } finally {
-      isScanning.value = false;
-    }
-  };
-
+  /**
+   * Request WebHID permission
+   */
   const requestNew = async () => {
+    state.value = 'authorizing';
     try {
-      if ('hid' in navigator) {
-        const filters = [{ vendorId: 0x34b7, productId: 0xffff, usagePage: 0xff00, usage: 0x01 }];
-        // @ts-ignore
-        const devices = await navigator.hid.requestDevice({ filters });
-        
-        // Only scan if user actually selected a device
-        if (devices.length > 0) {
-            await scan();
-        } else {
-            addLog('No device selected.');
-        }
+      const authorized = await hHubClient.requestDevice();
+      if (authorized) {
+        state.value = 'authorized';
+        await scan();
       } else {
-        addLog('WebHID not supported.');
+        state.value = 'idle';
+        addLog('User cancelled device selection');
       }
     } catch (e: any) {
+      state.value = 'error';
+      error.value = e.message;
       addLog(`Request error: ${e.message}`);
     }
   };
 
-  const connect = async (productId: any) => {
-    const devices = await service.getDevices();
-    const target = devices.find((d: any) => (d.productId === productId || d.device?.productId === productId));
-    
-    if (target) {
-      // HSDK XJHIDDevice wrapper has 'id'
-      const id = (target as any).id || target.device.productId;
-      if (await service.connectDevice(id)) {
-        connectedDevice.value = { 
-          deviceId: String(target.device.productId), 
-          label: target.device.productName || 'Keyboard' 
-        };
-        addLog('Connected.');
-        
-        // Fetch device details
-        try {
-          const info = await service.getDeviceInfo();
-          deviceInfo.value = info;
-          addLog(`Device: ${info.keyboardSN || 'N/A'}, FW: ${info.fwVersion}`);
-          
-          // Get key layout
-          const rows = info.row || 5;
-          const cols = info.col || 14;
-          const layout = await service.getLayout(0, rows, cols);
-          keyLayout.value = layout;
-          addLog(`Layout loaded: ${rows}x${cols}`);
-          
-          // Log layout data for debugging
-          console.log('Key Layout Matrix:', layout);
-          
-          // Get supported axes
-          try {
-            const axes = await service.getSupportAxis();
-            supportedAxes.value = axes;
-            addLog(`Axes: ${axes.axisCount} types`);
-          } catch (e) {
-            addLog('Axis info not available.');
-          }
-        } catch (e: any) {
-          addLog(`Get info failed: ${e.message}`);
-        }
-
-        return true;
+  /**
+   * Scan for available devices
+   */
+  const scan = async () => {
+    try {
+      const devices = await hHubClient.getDevices();
+      scannedDevices.value = devices;
+      addLog(`Scanned ${devices.length} devices`);
+      if (devices.length > 0 && state.value === 'idle') {
+          state.value = 'authorized';
       }
+    } catch (e: any) {
+      addLog(`Scan error: ${e.message}`);
     }
-    return false;
   };
 
+  /**
+   * Connect to a specific device
+   */
+  const connect = async (deviceId: string) => {
+    if (state.value === 'connecting') return;
+    
+    state.value = 'connecting';
+    addLog(`Connecting to ${deviceId}...`);
+
+    try {
+      const device = await hHubClient.connect(deviceId);
+      currentDevice.value = device;
+      
+      // Load initial data
+      try {
+        const info = await hHubClient.getDeviceInfo();
+        deviceInfo.value = info;
+        
+        // Update device version info
+        if (currentDevice.value) {
+            currentDevice.value.version = info.fwVersion;
+            currentDevice.value.serialNumber = info.keyboardSN;
+        }
+
+        const rows = info.row || 5;
+        const cols = info.col || 14;
+        keyLayout.value = await hHubClient.getLayout(rows, cols);
+        
+        try {
+            supportedAxes.value = await hHubClient.getSupportAxis();
+        } catch (e) {
+            console.warn('Axis support check failed', e);
+        }
+
+        state.value = 'connected';
+        error.value = null;
+        addLog(`Connected to ${device.name}`);
+      } catch (innerErr: any) {
+        // Connected but failed to init data?
+        console.error('Failed to initialize device data', innerErr);
+        // We still consider it connected, but maybe with warnings
+        state.value = 'connected'; 
+        addLog(`Connected but init failed: ${innerErr.message}`);
+      }
+
+    } catch (e: any) {
+      state.value = 'error';
+      error.value = e.message;
+      currentDevice.value = null;
+      addLog(`Connection failed: ${e.message}`);
+    }
+  };
+
+  /**
+   * Disconnect
+   */
   const disconnect = async () => {
-    await service.disconnectDevice();
-    connectedDevice.value = null;
-    addLog('Disconnected.');
+    state.value = 'disconnecting';
+    try {
+      await hHubClient.disconnect();
+    } catch (e) {
+      console.warn('Disconnect error', e);
+    } finally {
+      state.value = 'idle';
+      currentDevice.value = null;
+      keyLayout.value = [];
+      deviceInfo.value = null;
+      addLog('Disconnected');
+    }
   };
 
   return {
-    connectedDevice,
+    // State
+    state,
+    currentDevice, // Renamed from connectedDevice (but typed better)
     scannedDevices,
-    isScanning,
+    error,
     logs,
+    
+    // Details
     deviceInfo,
     keyLayout,
     supportedAxes,
-    addLog,
-    scan,
+
+    // Getters
+    isConnecting,
+    isConnected,
+    canConnect,
+    
+    // Actions
     requestNew,
+    scan,
     connect,
-    disconnect
+    disconnect,
+    addLog
   };
 });

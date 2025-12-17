@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import type { KeyData } from '../types/keyboard';
-import service from '../service';
+import { hHubClient } from '../service/HHubClient';
 import { useDeviceStore } from './device';
 
 export const useKeyboardStore = defineStore('keyboard', () => {
@@ -47,7 +47,7 @@ export const useKeyboardStore = defineStore('keyboard', () => {
       }
 
       // Read Layer 0 (fn=0)
-      const layoutData = await service.getLayout(0, rows, cols);
+      const layoutData = await hHubClient.getLayout(rows, cols);
       if (layoutData) {
         layoutData.forEach((rowVals, r) => {
           rowVals.forEach((val, c) => {
@@ -82,7 +82,7 @@ export const useKeyboardStore = defineStore('keyboard', () => {
 
         try {
           // In a real app, you might want to batch this or use a bulk API
-          const data = await service.getKeyPerformance(r, c);
+          const data = await hHubClient.getKeyPerformance(r, c);
           if (data) {
             const key = keyboard.value[r][c];
             // Update key object with fetched data
@@ -143,7 +143,7 @@ export const useKeyboardStore = defineStore('keyboard', () => {
 
   // Full Init
   const init = async () => {
-    if (!deviceStore.connectedDevice) return;
+    if (!deviceStore.currentDevice) return;
     isInitialized.value = false;
     await getBaseLayout();
     await getAllPerformance();
@@ -163,4 +163,3 @@ export const useKeyboardStore = defineStore('keyboard', () => {
     selectAll
   };
 });
-

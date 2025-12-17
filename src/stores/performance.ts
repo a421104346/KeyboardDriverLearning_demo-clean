@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { useKeyboardStore } from './keyboard';
 import { useDeviceStore } from './device';
-import service from '../service';
+import { hHubClient } from '../service/HHubClient';
 
 export const usePerformanceStore = defineStore('performance', () => {
   const keyboardStore = useKeyboardStore();
@@ -69,7 +69,7 @@ export const usePerformanceStore = defineStore('performance', () => {
           rtTravel: config.value.travel, // Usually sync with travel
           axis: key.axis // Keep existing axis
         };
-        await service.setKeyPerformance(r, c, payload);
+        await hHubClient.setKeyPerformance(r, c, payload);
 
         // 2. Update Store State
         Object.assign(key, config.value, { rtTravel: config.value.travel });
