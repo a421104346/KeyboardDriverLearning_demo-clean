@@ -168,22 +168,23 @@ const handleOverlayClick = () => {
 }
 
 .btn-cancel {
-  background: #f5f5f5;
-  color: #666;
+  background: #2c2c2c;
+  color: #fff;
+  border: 1px solid #2c2c2c;
 }
 
 .btn-cancel:hover {
-  background: #e0e0e0;
-  color: #333;
+  background: #3e3e3e;
 }
 
 .btn-confirm {
-  background: #222;
+  background: #000;
   color: #fff;
+  border: 1px solid #000;
 }
 
 .btn-confirm:hover {
-  background: #000;
+  background: #1a1a1a;
 }
 
 /* Fade Animation */
