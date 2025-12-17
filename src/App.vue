@@ -5,7 +5,6 @@
       
       <nav v-if="deviceStore.currentDevice" class="nav-menu">
         <router-link to="/keyperformance" class="nav-item" active-class="active">Key Performance</router-link>
-        <router-link to="/keytest" class="nav-item" active-class="active">Key Test</router-link>
         <router-link to="/keyassignment" class="nav-item" active-class="active">Key Assignment</router-link>
         <router-link to="/advancedkeys" class="nav-item" active-class="active">Advanced Keys</router-link>
         <router-link to="/lighting" class="nav-item" active-class="active">Lighting</router-link>

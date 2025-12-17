@@ -10,7 +10,6 @@ const routes = [
   { path: '/system', component: () => import('../views/System/index.vue') },
   { path: '/configurations', component: () => import('../views/Configurations/index.vue') },
   { path: '/firmware', component: () => import('../views/Firmware/index.vue') },
-  { path: '/keytest', component: () => import('../views/KeyTest/index.vue') },
 ];
 
 const router = createRouter({

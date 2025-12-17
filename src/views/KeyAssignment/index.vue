@@ -71,7 +71,7 @@ const keyLayout = computed(() => {
 
 // Initialization Logic
 const initData = async () => {
-  if (deviceStore.connectedDevice) {
+  if (deviceStore.currentDevice) {
     if (!keyboardStore.isInitialized) {
       await keyboardStore.init();
     }
@@ -83,7 +83,7 @@ const initData = async () => {
 
 onMounted(initData);
 
-watch(() => deviceStore.connectedDevice, (connected) => {
+watch(() => deviceStore.currentDevice, (connected) => {
   if (connected) initData();
 });
 

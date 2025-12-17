@@ -38,10 +38,10 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import RapidTriggerPanel from './RapidTriggerPanel.vue';
-import PerformancePresetPanel from './PerformancePresetPanel.vue';
-import SwitchPanel from './SwitchPanel.vue';
-import CalibrationPanel from './CalibrationPanel.vue';
+import RapidTriggerPanel from './components/RapidTriggerPanel.vue';
+import PerformancePresetPanel from './components/PerformancePresetPanel.vue';
+import SwitchPanel from './components/SwitchPanel.vue';
+import CalibrationPanel from './components/CalibrationPanel.vue';
 
 // Define props to match the original SettingPanel interface
 const props = defineProps<{

@@ -46,8 +46,14 @@ export const useKeyboardStore = defineStore('keyboard', () => {
         initKeyboardMatrix(rows, cols);
       }
 
-      // Read Layer 0 (fn=0)
-      const layoutData = await hHubClient.getLayout(rows, cols);
+      // Check if deviceStore already cached the layout to avoid duplicate requests
+      let layoutData = deviceStore.keyLayout;
+      
+      // If cached data is empty or invalid, fetch again
+      if (!layoutData || layoutData.length === 0) {
+         layoutData = await hHubClient.getLayout(rows, cols);
+      }
+
       if (layoutData) {
         layoutData.forEach((rowVals, r) => {
           rowVals.forEach((val, c) => {
@@ -145,8 +151,14 @@ export const useKeyboardStore = defineStore('keyboard', () => {
   const init = async () => {
     if (!deviceStore.currentDevice) return;
     isInitialized.value = false;
+    
     await getBaseLayout();
-    await getAllPerformance();
+    
+    // Performance data is optional for initial render, load it in background
+    getAllPerformance().catch(err => {
+      console.error("Background performance load failed", err);
+    });
+    
     isInitialized.value = true;
   };
 

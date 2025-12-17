@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useKeyboardStore } from './keyboard';
 import { useDeviceStore } from './device';
 import { hHubClient } from '../service/HHubClient';
@@ -26,8 +26,28 @@ export const usePerformanceStore = defineStore('performance', () => {
 
   // Read config from the FIRST selected key to update UI
   const readConfigFromSelection = () => {
+    // If no key selected, try to select the first valid key automatically
+    if (keyboardStore.selectedKeyList.length === 0) {
+      for(let r=0; r<keyboardStore.keyboard.length; r++) {
+        for(let c=0; c<keyboardStore.keyboard[r].length; c++) {
+          if (keyboardStore.keyboard[r][c].keyValue[0] !== 0) {
+             keyboardStore.selectKey(r, c);
+             break;
+          }
+        }
+        if (keyboardStore.selectedKeyList.length > 0) break;
+      }
+    }
+
     const firstKeyId = keyboardStore.selectedKeyList[0];
-    if (!firstKeyId) return;
+    if (!firstKeyId) {
+       // If still no key, verify if we have ANY data loaded. 
+       if (keyboardStore.isInitialized && keyboardStore.keyboard.length > 0) {
+          // Fallback: use default config and mark loaded
+          isLoaded.value = true; 
+       }
+       return;
+    }
 
     const [r, c] = firstKeyId.split('-').map(Number);
     const key = keyboardStore.keyboard[r]?.[c];
@@ -46,6 +66,21 @@ export const usePerformanceStore = defineStore('performance', () => {
       isLoaded.value = true;
     }
   };
+
+  // Watch for background data updates (e.g. initial load)
+  watch(() => {
+    const firstKeyId = keyboardStore.selectedKeyList[0];
+    if (!firstKeyId) return null;
+    const [r, c] = firstKeyId.split('-').map(Number);
+    // Watch travel as a proxy for all performance data
+    return keyboardStore.keyboard[r]?.[c]?.travel; 
+  }, (newVal) => {
+    // If value changed (and not just because selection changed)
+    // and we are not currently applying changes (to avoid loop)
+    if (newVal !== undefined && !isLoading.value) {
+        readConfigFromSelection();
+    }
+  });
 
   // Apply current UI config to ALL selected keys
   const applyConfig = async () => {
@@ -125,3 +160,4 @@ export const usePerformanceStore = defineStore('performance', () => {
     keyPerformanceData: keyboardStore.keyboard 
   };
 });
+        

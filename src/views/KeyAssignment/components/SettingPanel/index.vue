@@ -1,15 +1,17 @@
 <template>
   <div class="setting-panel">
-    <!-- Category Tabs -->
-    <div class="category-tabs">
-      <div 
-        v-for="tab in tabs" 
-        :key="tab.id"
-        class="tab-item"
-        :class="{ active: currentTab === tab.id }"
-        @click="currentTab = tab.id"
-      >
-        {{ tab.label }}
+    <!-- Category Tabs (Nav Bar style) -->
+    <div class="nav-bar-wrapper">
+      <div class="category-tabs">
+        <div 
+          v-for="tab in tabs" 
+          :key="tab.id"
+          class="tab-item"
+          :class="{ active: currentTab === tab.id }"
+          @click="currentTab = tab.id"
+        >
+          {{ tab.label }}
+        </div>
       </div>
     </div>
 
@@ -63,81 +65,50 @@ const handleKeySelection = (key: string) => {
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  overflow: hidden;
+  gap: 15px; /* Space between nav and content */
 }
 
-.layer-control {
-  display: flex;
-  align-items: center;
-  padding: 15px 20px;
-  border-bottom: 1px solid #eee;
-  gap: 15px;
-  background: #fafafa;
-}
-
-.layer-label {
-  font-weight: 600;
-  color: #333;
-}
-
-.layer-buttons {
-  display: flex;
-  gap: 10px;
-}
-
-.layer-buttons button {
-  padding: 6px 16px;
-  border: 1px solid #ddd;
-  background: #fff;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-size: 0.9rem;
-}
-
-.layer-buttons button:hover {
-  background: #f0f0f0;
-}
-
-.layer-buttons button.active {
-  background: #333;
-  color: #fff;
-  border-color: #333;
+.nav-bar-wrapper {
+  padding-left: 10px; /* Align with other content if needed */
 }
 
 .category-tabs {
-  display: flex;
-  padding: 10px 20px 0;
-  border-bottom: 1px solid #eee;
+  display: inline-flex;
   background: #fff;
-  gap: 20px;
+  border-radius: 8px;
+  padding: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  gap: 4px;
 }
 
 .tab-item {
-  padding: 10px 5px;
-  color: #666;
+  padding: 8px 16px;
   cursor: pointer;
+  border-radius: 6px;
+  font-size: 0.9rem;
   font-weight: 500;
-  border-bottom: 3px solid transparent;
+  color: #666;
   transition: all 0.2s;
+  user-select: none;
 }
 
 .tab-item:hover {
+  background: #f5f5f5;
   color: #333;
 }
 
 .tab-item.active {
-  color: #2196F3;
-  border-bottom-color: #2196F3;
+  background: #222; /* Dark active state */
+  color: #fff;
 }
 
 .content-area {
   flex: 1;
-  padding: 20px;
+  background: #fff; /* White card background */
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
   overflow-y: auto;
-  background: #f9f9f9;
+  padding: 20px;
+  min-height: 0; /* Allow scrolling inside */
 }
 </style>

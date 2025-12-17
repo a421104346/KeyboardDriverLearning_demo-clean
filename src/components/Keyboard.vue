@@ -1,6 +1,6 @@
 <template>
   <div class="keyboard-container">
-    <div class="keyboard-frame">
+    <div class="keyboard-frame" :style="frameStyle">
       <template v-for="(row, rowIndex) in layout" :key="rowIndex">
         <template v-for="(keyCap, colIndex) in row" :key="`${rowIndex}-${colIndex}`">
           <div 
@@ -64,6 +64,30 @@ const emit = defineEmits(['key-click']);
 const UNIT_SIZE = 54;
 const GAP = 4;
 
+const frameStyle = computed(() => {
+  if (!props.layout || props.layout.length === 0) return {};
+  
+  let maxX = 0;
+  let maxY = 0;
+  
+  props.layout.forEach(row => {
+    row.forEach((key: any) => {
+      const right = key.x + key.w;
+      const bottom = key.y + key.h;
+      if (right > maxX) maxX = right;
+      if (bottom > maxY) maxY = bottom;
+    });
+  });
+  
+  const width = maxX * (UNIT_SIZE + GAP) - GAP;
+  const height = maxY * (UNIT_SIZE + GAP) - GAP;
+  
+  return {
+    width: `${width}px`,
+    height: `${height}px`
+  };
+});
+
 const getKeyStyle = (keyCap: any) => {
   return {
     left: `${keyCap.x * (UNIT_SIZE + GAP)}px`,
@@ -112,22 +136,20 @@ const getPerformanceValue = (row: number, col: number, field: string) => {
 
 <style scoped>
 .keyboard-container {
-  display: flex;
+  display: inline-flex;
   justify-content: center;
   align-items: center;
-  padding: 0px;
+  padding: 10px;
   background: #090909;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-  overflow-x: auto;
-  min-height: 400px;
+  overflow: hidden;
 }
 
 .keyboard-frame {
   position: relative;
-  width: 900px; 
-  height: 300px;
   transform-origin: center;
+  transition: width 0.3s, height 0.3s;
 }
 
 .key-unit {

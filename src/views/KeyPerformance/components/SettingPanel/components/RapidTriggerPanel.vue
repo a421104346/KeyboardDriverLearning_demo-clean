@@ -30,9 +30,6 @@
       <div v-if="isLoading" class="loading-hint">
         Loading configuration...
       </div>
-      <div v-else-if="!isLoaded" class="loading-hint">
-        Click to load settings
-      </div>
       <div v-else class="panel-content">
         <div class="trigger-travel-section">
           <p class="section-desc">Shorter trigger travel means faster response, but increases the risk of accidental touches.</p>
@@ -259,9 +256,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
-import { usePerformanceStore } from '../../../stores/performance';
+import { usePerformanceStore } from '@/stores/performance';
 
 const props = defineProps<{
   isTesting: boolean;
@@ -274,6 +271,12 @@ defineEmits(['toggle-test', 'apply-config']);
 
 const performanceStore = usePerformanceStore();
 const { config } = storeToRefs(performanceStore);
+
+onMounted(() => {
+  if (!performanceStore.isLoaded) {
+    performanceStore.readConfigFromSelection();
+  }
+});
 
 // Constants
 const MAX_POSSIBLE_TRAVEL = 4.0;
@@ -347,7 +350,7 @@ const formatValue = (key: string, e: Event) => {
 .panel {
   display: flex;
   flex-direction: column;
-  padding: 20px 30px;
+  padding: 15px 25px;
   border-right: 1px solid #eee;
   overflow-y: auto;
   min-width: 0;
@@ -377,7 +380,7 @@ const formatValue = (key: string, e: Event) => {
   font-size: 1rem;
   font-weight: 600;
   color: #333;
-  margin: 0 0 10px 0;
+  margin: 0 0 6px 0;
 }
 
 .panel-content {
@@ -389,14 +392,14 @@ const formatValue = (key: string, e: Event) => {
 .section-desc {
   font-size: 0.85rem;
   color: #888;
-  margin: 0 0 10px 0;
+  margin: 0 0 6px 0;
   line-height: 1.4;
 }
 
 .section {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 12px;
 }
 
 .section-header {
@@ -479,7 +482,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 
 /* Trigger Travel Section */
 .trigger-travel-section {
-  margin-bottom: 10px;
+  margin-bottom: 6px;
 }
 
 .trigger-travel-section:last-child {
@@ -487,7 +490,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 
 .trigger-travel-section .control-label {
-  margin-bottom: 4px;
+  margin-bottom: 2px;
   font-size: 0.9rem;
   color: #666;
 }

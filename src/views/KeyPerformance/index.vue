@@ -3,6 +3,7 @@
     <div class="content-wrapper">
       <div class="keyboard-wrapper">
         <KeyboardPanel 
+          :key="refreshKey"
           :has-layout="isInitialized"
           :layout="K61_LAYOUT"
           :key-layout="keyLayout" 
@@ -36,7 +37,7 @@ import { useLightingStore } from '../../stores/lighting';
 import { K61_LAYOUT } from '../../config/layout';
 import service from '../../service';
 import KeyboardPanel from './components/KeyboardPanel.vue';
-import SettingPanel from './components/SettingPanel.vue';
+import SettingPanel from './components/SettingPanel/index.vue';
 
 const deviceStore = useDeviceStore();
 const keyboardStore = useKeyboardStore();
@@ -50,6 +51,7 @@ let timer: number | null = null;
 
 // Derived State
 const isInitialized = computed(() => keyboardStore.isInitialized);
+const refreshKey = ref(0);
 
 // Map KeyData[][] to number[][] for Keyboard component compatibility
 const keyLayout = computed(() => {
@@ -57,9 +59,16 @@ const keyLayout = computed(() => {
   return keyboardStore.keyboard.map(row => row.map(k => k.keyValue[0]));
 });
 
+// Force refresh when initialized
+watch(isInitialized, (newVal) => {
+  if (newVal) {
+    refreshKey.value++;
+  }
+});
+
 // Initialization Logic
 const initData = async () => {
-  if (deviceStore.connectedDevice) {
+  if (deviceStore.currentDevice) {
     if (!keyboardStore.isInitialized) {
       await keyboardStore.init();
     }
@@ -68,12 +77,14 @@ const initData = async () => {
        keyboardStore.selectAll();
     }
     performanceStore.readConfigFromSelection();
+    // Force refresh after manual init
+    refreshKey.value++;
   }
 };
 
 onMounted(initData);
 
-watch(() => deviceStore.connectedDevice, (connected) => {
+watch(() => deviceStore.currentDevice, (connected) => {
   if (connected) initData();
 });
 

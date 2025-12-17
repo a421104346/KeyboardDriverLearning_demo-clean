@@ -5,12 +5,12 @@
       <div v-if="devices.length > 0" class="device-list">
         <div 
           v-for="d in devices" 
-          :key="d.deviceId" 
+          :key="d.id" 
           class="device-item"
           @click="$emit('connect', d)"
         >
-          <span class="device-name">{{ d.label }}</span>
-          <span class="device-id">ID: {{ d.deviceId }}</span>
+          <span class="device-name">{{ d.name }}</span>
+          <span class="device-id">ID: {{ d.id }}</span>
         </div>
       </div>
       <div v-else class="no-devices">
@@ -23,10 +23,10 @@
 </template>
 
 <script setup lang="ts">
-import type { Device } from '../stores/device';
+import type { HHubDeviceInfo } from '../types/device';
 
 defineProps<{
-  devices: Device[];
+  devices: HHubDeviceInfo[];
 }>();
 
 defineEmits(['close', 'connect', 'request']);

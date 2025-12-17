@@ -1,17 +1,5 @@
 <template>
   <div class="keyboard-panel-container">
-    <div class="panel-content">
-      <component 
-        :is="activeComponent"
-        :has-layout="hasLayout"
-        :layout="layout"
-        :key-layout="keyLayout"
-        :key-colors="keyColors"
-        :selected-keys="selectedKeys"
-        @key-click="$emit('key-click', $event)"
-      />
-    </div>
-    
     <div class="layer-switcher">
       <div class="switcher-capsule">
         <div class="layer-label">Layer</div>
@@ -24,6 +12,18 @@
           {{ layer }}
         </button>
       </div>
+    </div>
+
+    <div class="panel-content">
+      <component 
+        :is="activeComponent"
+        :has-layout="hasLayout"
+        :layout="layout"
+        :key-layout="keyLayout"
+        :key-colors="keyColors"
+        :selected-keys="selectedKeys"
+        @key-click="$emit('key-click', $event)"
+      />
     </div>
   </div>
 </template>
@@ -64,23 +64,26 @@ const activeComponent = computed(() => {
   width: 100%;
   height: 100%;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   position: relative;
+  justify-content: center;
+  align-items: center;
 }
 
 .panel-content {
-  flex: 1;
-  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 20px;
 }
 
 .layer-switcher {
   flex: 0 0 auto;
   display: flex;
+  flex-direction: column;
   justify-content: center;
-  padding: 10px 0;
+  padding: 0;
+  margin-right: 20px;
 }
 
 .switcher-capsule {
@@ -88,16 +91,19 @@ const activeComponent = computed(() => {
   border-radius: 30px;
   padding: 4px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   gap: 4px;
 }
 
 .layer-label {
-  padding: 0 12px;
+  padding: 8px 0;
   font-weight: 600;
   color: #333;
   font-size: 0.9rem;
+  text-align: center;
+  width: 100%;
 }
 
 .switcher-capsule button {
