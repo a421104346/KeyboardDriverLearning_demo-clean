@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch, onMounted } from 'vue';
+import { reactive, computed, watch, onMounted } from 'vue';
 import { useDeviceStore } from '../../stores/device';
 import { useKeyboardStore } from '../../stores/keyboard';
 import { K61_LAYOUT } from '../../config/layout';
@@ -44,7 +44,7 @@ const keyLayout = computed(() => {
 
 // Initialization Logic
 const initData = async () => {
-  if (deviceStore.connectedDevice) {
+  if (deviceStore.currentDevice) {
     if (!keyboardStore.isInitialized) {
       await keyboardStore.init();
     }
@@ -53,7 +53,7 @@ const initData = async () => {
 
 onMounted(initData);
 
-watch(() => deviceStore.connectedDevice, (connected) => {
+watch(() => deviceStore.currentDevice, (connected) => {
   if (connected) initData();
 });
 

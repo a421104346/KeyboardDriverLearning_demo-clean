@@ -63,8 +63,8 @@ const handleOverlayClick = () => {
 .modal-container {
   background: #fff;
   border-radius: 16px;
-  width: calc(100% - 40px);
-  height: calc(100% - 40px);
+  width: calc(100% + 20px);
+  height: calc(100% + 0px);
   margin: 20px;
   display: flex;
   flex-direction: column;

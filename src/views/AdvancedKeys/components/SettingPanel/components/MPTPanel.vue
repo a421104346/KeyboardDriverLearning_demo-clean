@@ -1,60 +1,107 @@
 <template>
   <div class="mpt-panel">
-    <div class="panel-header">
-      <h3>Multi-Point Trigger (MPT)</h3>
-      <p class="description">
-        Configure multiple trigger points at different travel distances for a single key.
-      </p>
+    <div class="panel-column left">
+      <div class="section-title">
+        <h3>多点触发 (MPT)</h3>
+        <p>根据按下的深度触发不同的按键功能。</p>
+      </div>
+
+      <div class="mpt-list">
+        <div v-for="(item, index) in config.keyValue" :key="index" class="mpt-item">
+          <BindKey2 
+            :key-value="item" 
+            @key-drop="(v) => config.keyValue[index] = v"
+            @clear="config.keyValue[index] = 0"
+          />
+          
+          <div class="slider-wrapper">
+            <input 
+              type="range" 
+              v-model.number="config.triggerTravel[index]" 
+              min="0.1" 
+              max="4.0" 
+              step="0.1"
+              class="slider"
+            />
+            <span class="value">{{ config.triggerTravel[index].toFixed(1) }} mm</span>
+          </div>
+          
+          <span class="stage-label">触发点 {{ index + 1 }}</span>
+        </div>
+      </div>
     </div>
 
-    <div class="placeholder-content">
-      <p>⚙️ Coming Soon</p>
-      <p class="hint">This feature enables advanced users to set multiple actuation points along the key travel path.</p>
+    <div class="panel-column right">
+      <ChooseKey :types="['basic']" />
     </div>
   </div>
 </template>
 
+<script setup lang="ts">
+import { reactive } from 'vue';
+import BindKey2 from './BindKey2.vue';
+import ChooseKey from './ChooseKey/index.vue';
+
+const config = reactive({
+  keyValue: [0, 0, 0], // 3 points
+  triggerTravel: [1.0, 2.0, 3.0],
+});
+</script>
+
 <style scoped>
 .mpt-panel {
-  width: 100%;
-  padding: 20px;
+  display: flex;
+  height: 100%;
+  gap: 20px;
+  padding: 10px;
 }
-
-.panel-header {
-  margin-bottom: 30px;
-}
-
-.panel-header h3 {
-  margin: 0 0 10px 0;
-  color: #333;
-  font-size: 1.5rem;
-}
-
-.description {
-  color: #666;
-  font-size: 0.95rem;
-  line-height: 1.5;
-  margin: 0;
-}
-
-.placeholder-content {
+.panel-column {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 20px;
-  text-align: center;
-  color: #999;
+  gap: 20px;
 }
-
-.placeholder-content p {
-  margin: 10px 0;
+.section-title h3 {
+  margin: 0 0 8px 0;
   font-size: 1.1rem;
+  color: #333;
 }
-
-.placeholder-content .hint {
-  font-size: 0.9rem;
-  max-width: 500px;
+.section-title p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #888;
+}
+.mpt-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+.mpt-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: #f9f9f9;
+  padding: 10px;
+  border-radius: 8px;
+}
+.slider-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.slider {
+  flex: 1;
+}
+.value {
+  width: 60px;
+  text-align: right;
+  font-family: monospace;
+  color: #2196F3;
+}
+.stage-label {
+  width: 60px;
+  font-size: 0.85rem;
+  color: #888;
 }
 </style>
-
