@@ -92,10 +92,20 @@ export const useLightingStore = defineStore('lighting', () => {
         const colorIDResult = await hHubClient.getColorID(lightAreaInfo.areaID);
 
         // 初始化 RGB 矩阵
-        const lightAreaRGB: any[][] = Array.from(
+        // 尝试保留现有的 RGB 数据以防止页面切换时丢失
+        const existingArea = lightConfigs.value.find(a => a.lightAreaInfo?.areaID === lightAreaInfo.areaID);
+        let lightAreaRGB: any[][];
+
+        if (existingArea && 
+            existingArea.lightAreaRGB.length === lightAreaInfo.row && 
+            existingArea.lightAreaRGB[0]?.length === lightAreaInfo.col) {
+          lightAreaRGB = existingArea.lightAreaRGB;
+        } else {
+          lightAreaRGB = Array.from(
           { length: lightAreaInfo.row },
           () => Array.from({ length: lightAreaInfo.col }, () => ({ r: 0, g: 0, b: 0 }))
         );
+        }
 
         newConfigs.push({
           lightAreaInfo,

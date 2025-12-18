@@ -40,6 +40,26 @@ const keyLayout = computed(() => {
   return keyboardStore.keyboard.map(row => row.map(k => k.keyValue[0]));
 });
 
+const rgbToHex = (r: number, g: number, b: number) => {
+  return `#${[r, g, b].map(x => x.toString(16).padStart(2, '0')).join('')}`;
+};
+
+const syncLocalState = () => {
+  const area = lightingStore.lightConfigs.find(
+    c => c.lightAreaInfo?.areaID === lightingStore.currentLightArea
+  );
+  
+  if (area && area.lightAreaRGB) {
+    area.lightAreaRGB.forEach((rowRGB, rIndex) => {
+      rowRGB.forEach((rgb, cIndex) => {
+        const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+        // Update keyColors to match store state
+        keyColors[`${rIndex},${cIndex}`] = hex;
+      });
+    });
+  }
+};
+
 const loadConfig = async () => {
   // Ensure we have a connected device and initialization is done
   if (deviceStore.isConnected && deviceStore.currentDevice) {
@@ -48,6 +68,9 @@ const loadConfig = async () => {
       await keyboardStore.init();
     }
     await lightingStore.readConfig();
+    
+    // Sync local View state with Store state
+    syncLocalState();
   } else {
     console.warn('[Lighting] Skipping config load - Device not ready', { 
       connected: deviceStore.isConnected, 
