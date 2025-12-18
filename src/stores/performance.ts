@@ -59,23 +59,22 @@ export const usePerformanceStore = defineStore('performance', () => {
           await new Promise(resolve => setTimeout(resolve, retryDelay));
         }
 
-        const axes = await hHubClient.getSupportAxis();
+        const axisData = await hHubClient.getSupportAxis();
+        console.log('getSupportAxis response:', axisData);
         
-        if (Array.isArray(axes) && axes.length > 0) {
-            // Handle case where API returns only IDs
-            if (typeof axes[0] === 'number') {
-               axisList.value = axes.map((id: any) => ({
-                  id: Number(id),
-                  name: `Switch ${id}`,
-                  minTravel: 0.1,
-                  maxTravel: 4.0
-               }));
-            } else {
-               axisList.value = axes;
-            }
+        // SDK returns { axisCount, axisList }
+        if (axisData && axisData.axisList && Array.isArray(axisData.axisList) && axisData.axisList.length > 0) {
+            // Map axis IDs to AxisInfo objects
+            axisList.value = axisData.axisList.map((id: number) => ({
+              id: Number(id),
+              name: `Switch ${id}`,
+              minTravel: 0.1,
+              maxTravel: 4.0
+            }));
+            
             // Success! Clear error and return
             error.value = null;
-            console.log(`Successfully loaded ${axisList.value.length} axis types`);
+            console.log(`Successfully loaded ${axisList.value.length} axis types from device`);
             return;
         } else {
            axisList.value = [];

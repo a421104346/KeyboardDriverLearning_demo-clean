@@ -20,7 +20,10 @@
           v-for="axis in performanceStore.axisList" 
           :key="axis.id"
           class="switch-card"
-          :class="{ active: performanceStore.config.axis === axis.id }"
+          :class="{ 
+            selected: selectedAxisId === axis.id,
+            active: performanceStore.config.axis === axis.id 
+          }"
           @click="selectAxis(axis)"
         >
           <div class="switch-visual">
@@ -36,10 +39,29 @@
             </div>
           </div>
 
-          <div class="active-indicator" v-if="performanceStore.config.axis === axis.id">
-            Selected
+          <div class="status-badges">
+            <div class="badge applied" v-if="performanceStore.config.axis === axis.id">
+              ✓ Applied
+            </div>
+            <div class="badge selected-badge" v-else-if="selectedAxisId === axis.id">
+              Selected
+            </div>
           </div>
         </div>
+      </div>
+
+      <!-- Action Button -->
+      <div class="action-bar">
+        <button 
+          class="btn btn-apply" 
+          @click="applyAxisChange"
+          :disabled="!hasChanges || isApplying"
+        >
+          <span v-if="!isApplying">Apply Switch Change</span>
+          <span v-else class="applying">
+            <span class="spinner"></span> Applying...
+          </span>
+        </button>
       </div>
     </div>
   </div>
@@ -61,39 +83,63 @@
  * The Mock Data fallback is implemented to ensure the UI interactions and Store logic 
  * can be fully demonstrated for review purposes, independent of specific hardware support.
  */
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { usePerformanceStore } from '@/stores/performance';
 import type { AxisInfo } from '@/types/keyboard';
 
 const performanceStore = usePerformanceStore();
 const isLoading = ref(false);
+const selectedAxisId = ref<number | null>(null);
+const isApplying = ref(false);
+
+// Check if current selection differs from applied config
+const hasChanges = computed(() => {
+  return selectedAxisId.value !== null && selectedAxisId.value !== performanceStore.config.axis;
+});
 
 const loadData = async () => {
   isLoading.value = true;
   await performanceStore.getSupportAxis();
-  console.log('Current Axis List in Store:', performanceStore.axisList); // Debug Log
+  console.log('Current Axis List in Store:', performanceStore.axisList);
+  
+  // Initialize selected axis from current config
+  if (performanceStore.config.axis !== undefined) {
+    selectedAxisId.value = performanceStore.config.axis;
+  }
   isLoading.value = false;
 };
 
 onMounted(() => {
   if (performanceStore.axisList.length === 0) {
     loadData();
+  } else {
+    // Initialize from existing config
+    selectedAxisId.value = performanceStore.config.axis;
   }
 });
 
-const selectAxis = async (axis: AxisInfo) => {
-  if (performanceStore.config.axis === axis.id) return;
+const selectAxis = (axis: AxisInfo) => {
+  // Just update selection, don't apply yet
+  selectedAxisId.value = axis.id;
+};
+
+const applyAxisChange = async () => {
+  if (selectedAxisId.value === null || !hasChanges.value) return;
   
-  performanceStore.config.axis = axis.id;
-  
-  // If switching axis implies changing default travel limits, update them here
-  // For now, we just update the axis ID and apply
-  await performanceStore.applyConfig();
+  isApplying.value = true;
+  try {
+    performanceStore.config.axis = selectedAxisId.value;
+    await performanceStore.applyConfig();
+    console.log(`Applied axis change to: ${selectedAxisId.value}`);
+  } catch (error) {
+    console.error('Failed to apply axis change:', error);
+  } finally {
+    isApplying.value = false;
+  }
 };
 
 // Helper for visualization
 const getSwitchColor = (name: string = '') => {
-  console.log('Rendering Switch:', name); // Debug log
   const n = name.toLowerCase();
   if (n.includes('red')) return '#ff4d4f';
   if (n.includes('blue')) return '#1890ff';
@@ -116,6 +162,13 @@ const getSwitchColor = (name: string = '') => {
   overflow-y: auto;
   padding: 16px;
   background-color: #f8f9fa;
+  position: relative;
+}
+
+.switch-container {
+  position: relative;
+  min-height: 100%;
+  padding-bottom: 70px; /* Space for action bar */
 }
 
 .state-msg {
@@ -190,9 +243,14 @@ const getSwitchColor = (name: string = '') => {
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-.switch-card.active {
+.switch-card.selected {
   border-color: #1890ff;
-  background-color: #e6f7ff;
+  background-color: #f0f9ff;
+}
+
+.switch-card.active {
+  border-color: #52c41a;
+  background-color: #f6ffed;
 }
 
 /* Simple CSS Switch Graphic */
@@ -248,15 +306,92 @@ const getSwitchColor = (name: string = '') => {
   flex-direction: column;
 }
 
-.active-indicator {
+.status-badges {
   position: absolute;
   top: 8px;
   right: 8px;
+  display: flex;
+  gap: 4px;
+}
+
+.badge {
   font-size: 10px;
-  background: #1890ff;
-  color: #fff;
   padding: 2px 6px;
   border-radius: 10px;
+  font-weight: 500;
+}
+
+.badge.applied {
+  background: #52c41a;
+  color: #fff;
+}
+
+.badge.selected-badge {
+  background: #1890ff;
+  color: #fff;
+}
+
+/* Action Bar */
+.action-bar {
+  position: sticky;
+  bottom: 0;
+  margin: 16px -16px -16px -16px;
+  padding: 16px;
+  background: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+.btn {
+  padding: 10px 32px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.25s;
+  min-width: 160px;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #d9d9d9;
+  color: #999;
+}
+
+.btn-apply {
+  background: #1890ff;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(24, 144, 255, 0.3);
+}
+
+.btn-apply:hover:not(:disabled) {
+  background: #40a9ff;
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-apply:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.applying {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
 }
 
 .loader {
