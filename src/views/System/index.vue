@@ -1,18 +1,240 @@
 <template>
-  <div class="placeholder-container">
-    <h1>System Settings</h1>
-    <p>Coming Soon</p>
+  <div class="system-page">
+    <div class="header">
+      <div class="icon-wrapper">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"/>
+        </svg>
+      </div>
+      <span class="title">系统设置</span>
+    </div>
+
+    <t-card :bordered="false" class="settings-card">
+      <div class="setting-list">
+        <!-- 回报率设置 -->
+        <div class="setting-item">
+          <div class="info">
+            <div class="item-title">回报率设置</div>
+            <div class="item-desc">调整键盘的USB回报率，更高的回报率响应更快</div>
+          </div>
+          <div class="control">
+            <t-select 
+              v-model="settings.reportRate" 
+              :options="rateOptions" 
+              borderless
+              :filterable="false"
+              align="right"
+              style="width: 100px"
+            />
+          </div>
+        </div>
+
+        <t-divider />
+
+        <!-- 系统切换 -->
+        <div class="setting-item">
+          <div class="info">
+            <div class="item-title">系统切换</div>
+            <div class="item-desc">切换键盘的系统兼容模式</div>
+          </div>
+          <div class="control">
+            <t-select 
+              v-model="settings.systemMode" 
+              :options="systemOptions"
+              borderless
+              :filterable="false"
+              align="right"
+              style="width: 120px"
+            />
+          </div>
+        </div>
+
+        <t-divider />
+
+        <!-- WIN键锁定 -->
+        <div class="setting-item">
+          <div class="info">
+            <div class="item-title">WIN键锁定</div>
+            <div class="item-desc">锁定WIN键，防止游戏中误触</div>
+          </div>
+          <div class="control">
+            <t-switch v-model="settings.winLock" size="large" />
+          </div>
+        </div>
+
+        <t-divider />
+
+        <!-- 全键锁定 -->
+        <div class="setting-item">
+          <div class="info">
+            <div class="item-title">全键锁定</div>
+            <div class="item-desc">锁定所有按键，防止误触</div>
+          </div>
+          <div class="control">
+            <t-switch v-model="settings.fullKeyLock" size="large" />
+          </div>
+        </div>
+
+        <t-divider />
+
+        <!-- 恢复出厂设置 -->
+        <div class="setting-item">
+          <div class="info">
+            <div class="item-title">恢复出厂设置</div>
+            <div class="item-desc">将键盘所有设置恢复到出厂默认状态，此操作不可撤销</div>
+          </div>
+          <div class="control">
+            <t-button variant="outline" theme="danger" @click="handleReset">
+              恢复出厂
+            </t-button>
+          </div>
+        </div>
+      </div>
+    </t-card>
   </div>
 </template>
 
-<style scoped>
-.placeholder-container {
+<script setup lang="ts">
+import { reactive } from 'vue';
+import { MessagePlugin } from 'tdesign-vue-next';
+
+const settings = reactive({
+  reportRate: '8k',
+  systemMode: 'Windows',
+  winLock: true,
+  fullKeyLock: false
+});
+
+const rateOptions = [
+  { label: '4k', value: '4k' },
+  { label: '8k', value: '8k' }
+];
+
+const systemOptions = [
+  { label: 'Windows', value: 'Windows' },
+  { label: 'Mac', value: 'Mac' }
+];
+
+const handleReset = () => {
+  MessagePlugin.success('已恢复出厂设置');
+  settings.reportRate = '8k';
+  settings.systemMode = 'Windows';
+  settings.winLock = false;
+  settings.fullKeyLock = false;
+};
+</script>
+
+<style scoped lang="scss">
+.system-page {
+  width: 100%;
+  height: 100%;
+  padding: 40px;
+  box-sizing: border-box;
+  background-color: #f5f7fa;
   display: flex;
   flex-direction: column;
+  align-items: center; /* 水平居中 */
+  justify-content: center; /* 垂直居中 */
+  gap: 24px;
+}
+
+.header {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  height: 100%;
-  color: #888;
+  gap: 12px;
+  width: 100%;
+  max-width: 800px; /* 限制宽度 */
+
+  .icon-wrapper {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    background-color: #000;
+    border-radius: 8px;
+    
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  .title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+  }
+}
+
+.settings-card {
+  width: 100%;
+  max-width: 800px; /* 限制宽度 */
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  
+  :deep(.t-card__body) {
+    padding: 8px 32px;
+  }
+
+  /* 覆盖 TDesign Select 样式，使其更像纯文本 */
+  :deep(.t-select__wrap) {
+    width: auto;
+    
+    .t-input {
+      background: transparent;
+      border: none;
+      box-shadow: none !important;
+      padding: 0;
+    }
+    
+    .t-input__inner {
+      text-align: right;
+      font-size: 14px;
+      color: #333;
+    }
+    
+    .t-input--focused {
+      box-shadow: none !important;
+    }
+  }
+}
+
+.setting-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.setting-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+
+  .info {
+    .item-title {
+      font-size: 16px;
+      font-weight: 500;
+      color: #333;
+      margin-bottom: 4px;
+    }
+
+    .item-desc {
+      font-size: 14px;
+      color: #999;
+    }
+  }
+
+  .control {
+    display: flex;
+    align-items: center;
+  }
+}
+
+:deep(.t-divider) {
+  margin: 0;
+  opacity: 0.6;
 }
 </style>
-

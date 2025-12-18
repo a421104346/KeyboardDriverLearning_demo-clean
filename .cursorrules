@@ -1,15 +1,24 @@
 # Project Rules
 
 ## Tech Stack
-- Framework: Vue 3
-- Build Tool: Vite
-- Language: TypeScript
-- Device Communication: WebHID (via HSDK)
+- **Framework**: Vue 3 + TypeScript
+- **Build Tool**: Vite (Rolldown ready)
+- **Desktop Framework**: Electron
+- **UI Library**: TDesign Vue Next
+- **State Management**: Pinia
+- **Routing**: Vue Router
+- **Internationalization**: Vue I18n
+- **Charts**: ECharts
+- **Animation**: GSAP
+- **Styling**: SCSS + PostCSS
+- **HID Communication**: node-hid (Electron) / WebHID (Web)
+- **Utils**: VueUse
 
 ## Code Style
 - Use `<script setup lang="ts">` (Composition API).
 - Use SCSS for styling.
-- Store management: Pinia (if needed, or simple reactive state for demo).
+- **UI Components**: Prefer using **TDesign Vue Next** components (`<t-button>`, `<t-select>`, `<t-switch>`, etc.) over custom implementations.
+- **State Management**: Use Pinia stores defined in `src/stores/`.
 
 ## Device Communication
 - The project relies on `HSDK` for HID communication.
@@ -33,4 +42,3 @@
   - CMD_LED_CONTROL: 0x31
   - SUB_RGB: 0x04
   - Packet size: 64 bytes
-

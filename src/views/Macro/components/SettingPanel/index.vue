@@ -310,6 +310,7 @@ const resetMacro = () => {
   color: #000;
   /* Hide standard arrows */
   -moz-appearance: textfield;
+  appearance: textfield;
 }
 
 .value-display input::-webkit-outer-spin-button,
