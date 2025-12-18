@@ -2,8 +2,8 @@
   <div class="end-panel">
     <div class="panel-column left">
       <div class="section-title">
-        <h3>松开触发 (END)</h3>
-        <p>按下时触发按键A，松开时触发按键B。</p>
+        <h3>Key Release (END)</h3>
+        <p>Trigger Key A on press, Key B on release.</p>
       </div>
 
       <div class="bind-group">
@@ -13,7 +13,7 @@
             @key-drop="(v) => config.keyValue[0] = v"
             @clear="config.keyValue[0] = 0"
           />
-          <span class="label">按下触发</span>
+          <span class="label">On Press</span>
         </div>
         <div class="bind-item">
           <BindKey2 
@@ -21,13 +21,13 @@
             @key-drop="(v) => config.keyValue[1] = v"
             @clear="config.keyValue[1] = 0"
           />
-          <span class="label">松开触发</span>
+          <span class="label">On Release</span>
         </div>
       </div>
 
       <div class="setting-group">
-        <div class="setting-title">延迟时间</div>
-        <div class="setting-desc">设置松开触发前的延迟时间。</div>
+        <div class="setting-title">Delay Time</div>
+        <div class="setting-desc">Set the delay time before release trigger.</div>
         
         <div class="slider-control">
         <input 

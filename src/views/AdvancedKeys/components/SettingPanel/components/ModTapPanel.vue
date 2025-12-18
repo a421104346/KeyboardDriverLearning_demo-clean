@@ -2,8 +2,8 @@
   <div class="mt-panel">
     <div class="panel-column left">
       <div class="section-title">
-        <h3>双效点击 (MT)</h3>
-        <p>短按触发按键A，长按触发按键B。</p>
+        <h3>Mod Tap (MT)</h3>
+        <p>Tap for Key A, hold for Key B.</p>
       </div>
 
       <div class="bind-group">
@@ -13,7 +13,7 @@
             @key-drop="(v) => config.keyValue[0] = v"
             @clear="config.keyValue[0] = 0"
           />
-          <span class="label">短按 (Tap)</span>
+          <span class="label">Tap</span>
         </div>
         <div class="bind-item">
           <BindKey2 
@@ -21,13 +21,13 @@
             @key-drop="(v) => config.keyValue[1] = v"
             @clear="config.keyValue[1] = 0"
           />
-          <span class="label">长按 (Hold)</span>
+          <span class="label">Hold</span>
         </div>
       </div>
 
       <div class="setting-group">
-        <div class="setting-title">长按判定时间</div>
-        <div class="setting-desc">按住超过此时间判定为长按。</div>
+        <div class="setting-title">Hold Time</div>
+        <div class="setting-desc">Time required to trigger hold action.</div>
         
         <div class="slider-control">
           <input 

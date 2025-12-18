@@ -2,8 +2,8 @@
   <div class="tgl-panel">
     <div class="panel-column left">
       <div class="section-title">
-        <h3>切换开关 (TGL)</h3>
-        <p>按一次开启功能，长按持续触发功能，松开关闭。</p>
+        <h3>Toggle Key (TGL)</h3>
+        <p>Tap to toggle on, hold for continuous trigger, release to off.</p>
       </div>
 
       <div class="bind-group">
@@ -13,13 +13,13 @@
           @key-drop="(v) => config.keyValue = v"
           @clear="config.keyValue = 0"
         />
-          <span class="label">绑定按键</span>
+          <span class="label">Bound Key</span>
         </div>
       </div>
 
       <div class="setting-group">
-        <div class="setting-title">长按触发时间</div>
-        <div class="setting-desc">长按超过此时间后，松开按键将停止触发（非锁定状态）。</div>
+        <div class="setting-title">Hold Time</div>
+        <div class="setting-desc">Hold longer than this time to switch to continuous mode.</div>
         
         <div class="slider-control">
         <input 

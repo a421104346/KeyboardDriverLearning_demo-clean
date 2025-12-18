@@ -10,7 +10,7 @@
     <div class="button-wrapper">
       <button class="btn-add-advanced" @click="showModal = true">
         <span class="icon">+</span>
-        <span class="text">添加高级键</span>
+        <span class="text">Add Advanced Key</span>
       </button>
     </div>
 
@@ -43,14 +43,14 @@ const currentTab = ref('socd');
 const showModal = ref(false);
 
 const tabs = [
-  { id: 'socd', label: '优先设定 (SOCD)', component: SOCDPanel },
-  { id: 'dks', label: '动态键程 (DKS)', component: DKSPanel },
-  { id: 'modtap', label: '双效点击 (MT)', component: ModTapPanel },
-  { id: 'mpt', label: '多点触发 (MPT)', component: MPTPanel },
-  { id: 'toggle', label: '切换开关 (TGL)', component: ToggleKeyPanel },
-  { id: 'end', label: '松开触发 (END)', component: ENDPanel },
-  { id: 'ek', label: '封禁键 (EK)', component: EKPanel },
-  { id: 'web', label: '网址按键 (WEB)', component: WEBPanel }
+  { id: 'socd', label: 'SOCD', component: SOCDPanel },
+  { id: 'dks', label: 'DKS', component: DKSPanel },
+  { id: 'modtap', label: 'Mod Tap', component: ModTapPanel },
+  { id: 'mpt', label: 'Multi-Point Trigger', component: MPTPanel },
+  { id: 'toggle', label: 'Toggle Key', component: ToggleKeyPanel },
+  { id: 'end', label: 'Key Release', component: ENDPanel },
+  { id: 'ek', label: 'Disable Key', component: EKPanel },
+  { id: 'web', label: 'Website Key', component: WEBPanel }
 ];
 
 const currentTabComponent = computed(() => {

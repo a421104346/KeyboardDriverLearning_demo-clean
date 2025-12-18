@@ -2,13 +2,13 @@
   <div class="web-panel">
     <div class="panel-column left">
       <div class="section-title">
-        <h3>网址按键 (WEB)</h3>
-        <p>绑定一个按键，按下后自动打开指定网址。</p>
+        <h3>Website Key (WEB)</h3>
+        <p>Bind a key to open a specific URL.</p>
       </div>
 
       <div class="web-input-wrapper">
         <div class="input-label-row">
-        <label for="web-url">URL 地址</label>
+        <label for="web-url">URL</label>
           <span class="length-hint">{{ config.web.length }} / {{ config.length }}</span>
         </div>
         <div class="input-group">
@@ -20,7 +20,7 @@
             class="url-input"
           />
         </div>
-        <p class="hint">请以 http:// 或 https:// 开头</p>
+        <p class="hint">Please start with http:// or https://</p>
       </div>
     </div>
 
@@ -28,7 +28,7 @@
     <div class="panel-column right empty-placeholder">
       <div class="preview">
         <span class="preview-icon">🌐</span>
-        <span class="preview-text">一键直达</span>
+        <span class="preview-text">Direct Link</span>
       </div>
     </div>
   </div>
@@ -114,11 +114,12 @@ const config = reactive({
 .url-input {
   flex: 1;
   padding: 10px 12px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #000;
   border-radius: 6px;
   font-size: 0.95rem;
   transition: all 0.2s;
-  color: #333;
+  color: #000;
+  background-color: #fff;
 }
 
 .url-input:focus {

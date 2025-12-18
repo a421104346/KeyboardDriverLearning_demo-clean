@@ -2,8 +2,8 @@
   <div class="dks-panel">
     <div class="panel-column left">
       <div class="section-title">
-        <h3>动态键程 (DKS)</h3>
-        <p>绑定一个按键，并根据您的设置决定他们如何触发。</p>
+        <h3>Dynamic Keystroke (DKS)</h3>
+        <p>Bind keys and decide how they trigger based on your settings.</p>
       </div>
 
       <div class="dks-list">

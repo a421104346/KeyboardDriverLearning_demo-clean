@@ -34,9 +34,9 @@ import Key from './Key.vue';
 const activeTab = ref('basic');
 
 const tabs = [
-  { label: '基本按键', value: 'basic' },
-  { label: '媒体按键', value: 'media' },
-  { label: '鼠标按键', value: 'mouse' },
+  { label: 'Basic Keys', value: 'basic' },
+  { label: 'Media Keys', value: 'media' },
+  { label: 'Mouse Keys', value: 'mouse' },
 ];
 
 // Media Keys Data (from MediaKeyPanel.vue)

@@ -2,14 +2,14 @@
   <div class="ek-panel">
     <div class="panel-column left">
       <div class="section-title">
-        <h3>封禁键 (EK)</h3>
-        <p>当按下特殊键时，禁用普通键的功能。</p>
+        <h3>Disable Key (EK)</h3>
+        <p>Disable normal key functions when a special key is pressed.</p>
       </div>
 
       <div class="ek-group">
         <!-- Special Keys (Trigger) -->
         <div class="group-section">
-        <div class="group-title">特殊键 (触发禁用)</div>
+        <div class="group-title">Trigger Keys</div>
         <div class="special-keys">
           <div v-for="(key, idx) in config.specialKey" :key="idx" class="key-slot">
             <BindKey2 
@@ -23,13 +23,13 @@
 
         <div class="divider">
           <span class="divider-line"></span>
-          <span class="divider-text">禁用</span>
+          <span class="divider-text">Disable</span>
           <span class="divider-line"></span>
         </div>
 
         <!-- Normal Key (Target) -->
         <div class="group-section">
-        <div class="group-title">普通键 (被禁用)</div>
+        <div class="group-title">Target Key</div>
         <div class="normal-key">
           <BindKey2 
             :key-value="config.normalKey" 

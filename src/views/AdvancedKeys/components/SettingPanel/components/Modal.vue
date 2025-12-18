@@ -8,10 +8,10 @@
             <div class="modal-header-left">
               <h2 class="modal-title">{{ title }}</h2>
               <div class="modal-bind-keys">
-                <span class="bind-key-label">按键绑定：</span>
+                <span class="bind-key-label">Key Binding:</span>
                 <div class="bind-key-box"></div>
                 <div class="bind-key-box"></div>
-                <span class="bind-key-hint">(请点击上方键盘选择要绑定的按键)</span>
+                <span class="bind-key-hint">(Please select keys to bind from the keyboard above)</span>
               </div>
             </div>
             <button class="btn-close" @click="$emit('close')">×</button>
@@ -24,8 +24,8 @@
 
           <!-- Footer -->
           <div class="modal-footer">
-            <button class="btn-cancel" @click="$emit('close')">取消</button>
-            <button class="btn-confirm" @click="$emit('confirm')">确认</button>
+            <button class="btn-cancel" @click="$emit('close')">Cancel</button>
+            <button class="btn-confirm" @click="$emit('confirm')">Confirm</button>
           </div>
         </div>
       </Transition>

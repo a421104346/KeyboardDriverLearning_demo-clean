@@ -2,8 +2,8 @@
   <div class="mpt-panel">
     <div class="panel-column left">
       <div class="section-title">
-        <h3>多点触发 (MPT)</h3>
-        <p>根据按下的深度触发不同的按键功能。</p>
+        <h3>Multi-Point Trigger (MPT)</h3>
+        <p>Trigger different keys based on press depth.</p>
       </div>
 
       <div class="mpt-list">
@@ -38,7 +38,7 @@
             </div>
           </div>
           
-          <span class="stage-label">触发点 {{ index + 1 }}</span>
+          <span class="stage-label">Point {{ index + 1 }}</span>
         </div>
       </div>
     </div>

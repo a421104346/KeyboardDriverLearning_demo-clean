@@ -3,8 +3,8 @@
     <!-- Left: Bind Keys & Delay -->
     <div class="panel-column left">
       <div class="section-title">
-        <h3>优先设定 (SOCD)</h3>
-        <p>绑定两个按键，并根据您的设置决定他们如何触发。</p>
+        <h3>SOCD</h3>
+        <p>Bind two keys and set their priority.</p>
       </div>
       
       <div class="bind-group">
@@ -14,7 +14,7 @@
             @key-drop="(v) => config.keyValue[0] = v"
             @clear="config.keyValue[0] = 0"
           />
-          <span class="label">按键 A</span>
+          <span class="label">Key A</span>
         </div>
         <div class="bind-item">
           <BindKey2 
@@ -22,13 +22,13 @@
             @key-drop="(v) => config.keyValue[1] = v"
             @clear="config.keyValue[1] = 0"
           />
-          <span class="label">按键 B</span>
+          <span class="label">Key B</span>
         </div>
       </div>
 
       <div class="delay-setting">
-        <div class="setting-title">延迟时间</div>
-        <div class="setting-desc">延迟时间是指按键A和按键B之间的延迟时间。</div>
+        <div class="setting-title">Delay Time</div>
+        <div class="setting-desc">Delay between Key A and Key B.</div>
         
         <div class="slider-control">
           <input 
@@ -53,8 +53,8 @@
     <!-- Center: Priority -->
     <div class="panel-column center">
       <div class="section-title">
-        <h3>优先级设定</h3>
-        <p>设置A键和B键触发的优先级。</p>
+        <h3>Priority Settings</h3>
+        <p>Set trigger priority for Key A and Key B.</p>
       </div>
       
       <div class="priority-options">
@@ -90,10 +90,10 @@ const config = reactive({
 });
 
 const priorityOptions = [
-  { label: '后覆盖', value: 0 },
-  { label: 'A优先', value: 1 },
-  { label: 'B优先', value: 2 },
-  { label: '相抵消', value: 3 },
+  { label: 'Last Win', value: 0 },
+  { label: 'A Prior', value: 1 },
+  { label: 'B Prior', value: 2 },
+  { label: 'Neutral', value: 3 },
 ];
 </script>
 

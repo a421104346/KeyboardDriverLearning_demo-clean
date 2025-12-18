@@ -31,7 +31,7 @@ const emit = defineEmits(['clear', 'key-drop']);
 const isHovered = ref(false);
 
 const displayText = computed(() => {
-  if (props.keyValue === 0) return '无';
+  if (props.keyValue === 0) return 'None';
   return getKeyLabel(props.keyValue);
 });
 
