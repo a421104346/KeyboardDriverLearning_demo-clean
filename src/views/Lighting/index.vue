@@ -41,11 +41,18 @@ const keyLayout = computed(() => {
 });
 
 const loadConfig = async () => {
+  // Ensure we have a connected device and initialization is done
   if (deviceStore.isConnected && deviceStore.currentDevice) {
+    // Re-initialize keyboard if needed (though deviceStore should handle basics)
     if (!keyboardStore.isInitialized) {
       await keyboardStore.init();
     }
     await lightingStore.readConfig();
+  } else {
+    console.warn('[Lighting] Skipping config load - Device not ready', { 
+      connected: deviceStore.isConnected, 
+      device: !!deviceStore.currentDevice 
+    });
   }
 };
 
@@ -55,8 +62,16 @@ onMounted(() => {
   }
 });
 
+// Watch for connection state changes
 watch(() => deviceStore.isConnected, (connected) => {
   if (connected) {
+    loadConfig();
+  }
+});
+
+// Watch for device object changes (e.g. swapping devices while staying connected, if supported)
+watch(() => deviceStore.currentDevice, (newDevice) => {
+  if (newDevice && deviceStore.isConnected) {
     loadConfig();
   }
 });
