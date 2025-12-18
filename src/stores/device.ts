@@ -11,7 +11,6 @@ export const useDeviceStore = defineStore('device', () => {
   const currentDevice = ref<HHubDeviceInfo | null>(null);
   const scannedDevices = ref<HHubDeviceInfo[]>([]);
   const error = ref<string | null>(null);
-  const logs = ref<string[]>([]);
 
   // Device Details (cached after connection)
   const deviceInfo = ref<any>(null);
@@ -25,7 +24,6 @@ export const useDeviceStore = defineStore('device', () => {
 
   // Helper
   const addLog = (msg: string) => {
-    logs.value.unshift(`${new Date().toLocaleTimeString()} - ${msg}`);
     console.log(`[DeviceStore] ${msg}`);
   };
 
@@ -143,7 +141,6 @@ export const useDeviceStore = defineStore('device', () => {
     currentDevice, // Renamed from connectedDevice (but typed better)
     scannedDevices,
     error,
-    logs,
     
     // Details
     deviceInfo,
