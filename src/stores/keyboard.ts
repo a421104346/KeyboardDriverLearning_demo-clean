@@ -3,22 +3,29 @@ import { ref } from 'vue';
 import type { KeyData } from '../types/keyboard';
 import { hHubClient } from '../service/HHubClient';
 import { useDeviceStore } from './device';
+import { usePerformanceStore } from './performance';
 
 export const useKeyboardStore = defineStore('keyboard', () => {
   const deviceStore = useDeviceStore();
+  // const performanceStore = usePerformanceStore(); // Moved inside init to avoid circular dependency
 
+  // Core Data
   const keyboard = ref<KeyData[][]>([]);
   const selectedKeyList = ref<string[]>([]); // Format: "row-col"
+  
+  // Initialization State
   const isInitialized = ref(false);
+  const initProgress = ref(0);
 
-  // Initialize the keyboard matrix structure
+  // --- Internal Helpers ---
+
   const initKeyboardMatrix = (rows: number, cols: number) => {
     keyboard.value = Array.from({ length: rows }, (_, r) =>
       Array.from({ length: cols }, (_, c) => ({
         row: r,
         col: c,
-        keyValue: [0, 0, 0, 0], // 4 layers
-        travel: 4.0, // Default fallback
+        keyValue: [0, 0, 0, 0],
+        travel: 4.0,
         isRT: false,
         rtTravel: 4.0,
         rtPress: 0.5,
@@ -34,26 +41,70 @@ export const useKeyboardStore = defineStore('keyboard', () => {
     );
   };
 
-  // Load layout from device
+  // --- Initialization Flow (The Coordinator) ---
+
+  const init = async () => {
+    if (!deviceStore.currentDevice) return;
+    
+    isInitialized.value = false;
+    initProgress.value = 0;
+
+    try {
+      const performanceStore = usePerformanceStore();
+      deviceStore.addLog('Starting Keyboard Initialization...');
+
+      // 1. Get Device Dimensions & Base Layout
+      // This is critical, we can't do anything else without the matrix
+      await getBaseLayout();
+      initProgress.value = 30;
+
+      // 2. Load Device Capabilities (Performance metadata)
+      // Getting precision/axes first is often required to interpret key data correctly
+      await performanceStore.getPrecision();
+      // Fire getSupportAxis without waiting (non-blocking, like H-Hub does)
+      // This prevents timeout from blocking the main init flow
+      performanceStore.getSupportAxis(); // No await!
+      initProgress.value = 50;
+
+      // 3. Load Per-Key Data
+      // Passing the matrix to the specialized store to fill
+      await performanceStore.initPerformance(keyboard.value);
+      initProgress.value = 100;
+
+      // Future: Add Light/Macro init here
+      // await lightStore.initLight(keyboard.value);
+      
+      deviceStore.addLog('Keyboard Initialization Complete.');
+    } catch (error: any) {
+      deviceStore.addLog(`Init failed: ${error.message}`);
+      console.error('Keyboard init failed', error);
+    } finally {
+      isInitialized.value = true;
+    }
+  };
+
+  // --- Sub-Tasks ---
+
   const getBaseLayout = async () => {
     try {
-      // Use device info or fallback defaults
       const rows = deviceStore.deviceInfo?.row || 6;
       const cols = deviceStore.deviceInfo?.col || 21;
       
-      // Ensure matrix exists
-      if (keyboard.value.length === 0 || keyboard.value.length !== rows || keyboard.value[0].length !== cols) {
+      // Initialize Matrix
+      if (keyboard.value.length !== rows || keyboard.value[0]?.length !== cols) {
         initKeyboardMatrix(rows, cols);
       }
 
-      // Check if deviceStore already cached the layout to avoid duplicate requests
+      // Fetch Layout (with caching check from deviceStore if desired)
+      // For simplicity, we fetch fresh here, or rely on hHubClient caching if implemented
       let layoutData = deviceStore.keyLayout;
-      
-      // If cached data is empty or invalid, fetch again
       if (!layoutData || layoutData.length === 0) {
          layoutData = await hHubClient.getLayout(rows, cols);
+         // Update device store cache
+         deviceStore.keyLayout = layoutData;
       }
 
+      // Populate Matrix
       if (layoutData) {
         layoutData.forEach((rowVals, r) => {
           rowVals.forEach((val, c) => {
@@ -63,57 +114,13 @@ export const useKeyboardStore = defineStore('keyboard', () => {
           });
         });
       }
-      deviceStore.addLog('Base layout loaded.');
     } catch (e: any) {
-      deviceStore.addLog(`Layout load error: ${e.message}`);
+      throw new Error(`Layout load error: ${e.message}`);
     }
   };
 
-  // Load performance data for all valid keys
-  const getAllPerformance = async () => {
-    const rows = keyboard.value.length;
-    if (rows === 0) return;
-    const cols = keyboard.value[0].length;
+  // --- Selection Logic ---
 
-    deviceStore.addLog('Reading all key performance data...');
-    
-    let count = 0;
-    for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < cols; c++) {
-        // Safety check to prevent "Cannot read properties of undefined" errors
-        if (!keyboard.value[r] || !keyboard.value[r][c]) continue;
-
-        // Skip empty keys to save time and API calls
-        if (keyboard.value[r][c].keyValue[0] === 0) continue;
-
-        try {
-          // In a real app, you might want to batch this or use a bulk API
-          const data = await hHubClient.getKeyPerformance(r, c);
-          if (data) {
-            const key = keyboard.value[r][c];
-            // Update key object with fetched data
-            Object.assign(key, {
-              travel: data.travel,
-              isRT: data.isRT,
-              rtPress: data.rtPress,
-              rtRelease: data.rtRelease,
-              topDeadZone: data.topDeadZone,
-              bottomDeadZone: data.bottomDeadZone,
-              releaseDeadZone: data.releaseDeadZone,
-              // H-Hub uses rtTravel same as travel usually
-              rtTravel: data.travel 
-            });
-            count++;
-          }
-        } catch (e) {
-          // Ignore errors for individual keys to proceed
-        }
-      }
-    }
-    deviceStore.addLog(`Performance data loaded for ${count} keys.`);
-  };
-
-  // Select Key Logic
   const selectKey = (row: number, col: number, multi = false) => {
     const keyId = `${row}-${col}`;
     if (!multi) {
@@ -147,28 +154,16 @@ export const useKeyboardStore = defineStore('keyboard', () => {
     selectedKeyList.value = all;
   };
 
-  // Full Init
-  const init = async () => {
-    if (!deviceStore.currentDevice) return;
-    isInitialized.value = false;
-    
-    await getBaseLayout();
-    
-    // Performance data is optional for initial render, load it in background
-    getAllPerformance().catch(err => {
-      console.error("Background performance load failed", err);
-    });
-    
-    isInitialized.value = true;
-  };
-
   return {
+    // State
     keyboard,
     selectedKeyList,
     isInitialized,
+    initProgress,
+    
+    // Actions
     init,
     getBaseLayout,
-    getAllPerformance,
     selectKey,
     isKeySelected,
     clearSelection,
