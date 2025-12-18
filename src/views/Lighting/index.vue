@@ -41,7 +41,7 @@ const keyLayout = computed(() => {
 });
 
 const loadConfig = async () => {
-  if (deviceStore.currentDevice) {
+  if (deviceStore.isConnected && deviceStore.currentDevice) {
     if (!keyboardStore.isInitialized) {
       await keyboardStore.init();
     }
@@ -50,11 +50,13 @@ const loadConfig = async () => {
 };
 
 onMounted(() => {
-  loadConfig();
+  if (deviceStore.isConnected) {
+    loadConfig();
+  }
 });
 
-watch(() => deviceStore.currentDevice, (newDevice) => {
-  if (newDevice) {
+watch(() => deviceStore.isConnected, (connected) => {
+  if (connected) {
     loadConfig();
   }
 });
