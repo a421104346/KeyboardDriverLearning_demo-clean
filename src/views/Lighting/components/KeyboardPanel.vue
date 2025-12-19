@@ -3,7 +3,7 @@
     <Keyboard 
       :layout="layout" 
       :key-layout="keyLayout"
-      :key-colors="keyColors" 
+      :key-colors="displayKeyColors" 
       :selected-keys="selectedKeys"
       @key-click="onKeyClick"
     />
@@ -11,14 +11,29 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import Keyboard from '../../../components/Keyboard.vue';
 
-defineProps<{
+const props = defineProps<{
   layout: any;
   keyLayout: any[][];
   keyColors: Record<string, string>;
   selectedKeys: string[];
 }>();
+
+const displayKeyColors = computed(() => {
+  const colors: Record<string, string> = {};
+  for (const key in props.keyColors) {
+    const color = props.keyColors[key];
+    // If color is black (LED off), use default keycap color (#333)
+    if (color === '#000000') {
+      colors[key] = '#333333';
+    } else {
+      colors[key] = color;
+    }
+  }
+  return colors;
+});
 
 const emit = defineEmits(['key-click']);
 

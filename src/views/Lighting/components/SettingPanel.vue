@@ -23,10 +23,10 @@
             >
               <div class="mode-icon">
                 <!-- Simple SVG icons based on index to differentiate -->
-                <svg v-if="i-1 === 0" viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/><path fill="currentColor" d="M7 11h10v2H7z"/></svg>
-                <svg v-else-if="i-1 === 1" viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M3 3h18v18H3z"/></svg>
-                <svg v-else-if="i-1 === 2" viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
-                <svg v-else viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="6" fill="currentColor"/></svg>
+                <svg v-if="i-1 === 0" viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/><path fill="currentColor" d="M7 11h10v2H7z"/></svg>
+                <svg v-else-if="i-1 === 1" viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M3 3h18v18H3z"/></svg>
+                <svg v-else-if="i-1 === 2" viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+                <svg v-else viewBox="0 0 24 24" width="20" height="20"><circle cx="12" cy="12" r="6" fill="currentColor"/></svg>
               </div>
               <span class="mode-name">{{ i-1 === 0 ? 'Static' : `Dynamic ${i-1}` }}</span>
             </button>
@@ -172,7 +172,13 @@ const selectPresetColor = (color: string) => {
 
 .panel:first-child {
   padding-left: 30px; /* Reduced padding */
+  align-items: center; /* Center content horizontally */
 }
+
+.panel:first-child .panel-content {
+  width: 100%;
+}
+
 
 .panel:last-child {
   border-right: none;
@@ -250,8 +256,8 @@ const selectPresetColor = (color: string) => {
 
 .mode-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 6px; /* Reduced gap */
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px; /* Reduced gap */
 }
 
 .mode-btn {
@@ -262,7 +268,7 @@ const selectPresetColor = (color: string) => {
   background: #fff;
   border: 1px solid #eee;
   border-radius: 6px;
-  padding: 6px 4px; /* Reduced padding */
+  padding: 4px 2px; /* Reduced padding */
   cursor: pointer;
   transition: all 0.2s;
   aspect-ratio: 1;
