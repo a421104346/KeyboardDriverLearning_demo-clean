@@ -1,6 +1,6 @@
 <template>
   <div class="choose-key-card">
-    <!-- Tab 导航 -->
+    <!-- Tab Navigation -->
     <div class="choose-key-tabs">
       <div 
         v-for="tab in tabs" 
@@ -13,7 +13,7 @@
       </div>
     </div>
 
-    <!-- 按键列表 -->
+    <!-- Key List -->
     <div class="choose-key-list-wrapper">
       <div class="choose-key-list">
         <Key 

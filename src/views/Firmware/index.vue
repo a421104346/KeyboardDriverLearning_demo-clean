@@ -174,7 +174,7 @@ import { CopyIcon, UploadIcon, ArrowRightIcon, ChevronDownIcon } from 'tdesign-i
     .info-item {
       display: flex;
       flex-direction: column;
-      align-items: flex-start; /* 确保文字左对齐 */
+      align-items: flex-start; /* Ensure text aligns left */
 
       .label {
         font-size: 14px;

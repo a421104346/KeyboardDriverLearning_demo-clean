@@ -12,7 +12,7 @@
 
     <t-card :bordered="false" class="settings-card">
       <div class="setting-list">
-        <!-- 回报率设置 -->
+        <!-- Polling Rate Settings -->
         <div class="setting-item">
           <div class="info">
             <div class="item-title">Polling Rate</div>
@@ -32,7 +32,7 @@
 
         <t-divider />
 
-        <!-- 系统切换 -->
+        <!-- System Switch -->
         <div class="setting-item">
           <div class="info">
             <div class="item-title">System Switch</div>
@@ -52,7 +52,7 @@
 
         <t-divider />
 
-        <!-- WIN键锁定 -->
+        <!-- Win Lock -->
         <div class="setting-item">
           <div class="info">
             <div class="item-title">Win Lock</div>
@@ -65,7 +65,7 @@
 
         <t-divider />
 
-        <!-- 全键锁定 -->
+        <!-- Full Key Lock -->
         <div class="setting-item">
           <div class="info">
             <div class="item-title">Full Key Lock</div>
@@ -78,7 +78,7 @@
 
         <t-divider />
 
-        <!-- 恢复出厂设置 -->
+        <!-- Factory Reset -->
         <div class="setting-item">
           <div class="info">
             <div class="item-title">Factory Reset</div>
@@ -134,8 +134,8 @@ const handleReset = () => {
   background-color: #f5f7fa;
   display: flex;
   flex-direction: column;
-  align-items: center; /* 水平居中 */
-  justify-content: center; /* 垂直居中 */
+  align-items: center; /* Horizontal Center */
+  justify-content: center; /* Vertical Center */
   gap: 24px;
 }
 
@@ -144,7 +144,7 @@ const handleReset = () => {
   align-items: center;
   gap: 12px;
   width: 100%;
-  max-width: 800px; /* 限制宽度 */
+  max-width: 800px; /* Limit Width */
 
   .icon-wrapper {
     width: 32px;
@@ -171,7 +171,7 @@ const handleReset = () => {
 
 .settings-card {
   width: 100%;
-  max-width: 800px; /* 限制宽度 */
+  max-width: 800px; /* Limit Width */
   border-radius: 16px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
   
@@ -179,7 +179,7 @@ const handleReset = () => {
     padding: 8px 32px;
   }
 
-  /* 覆盖 TDesign Select 样式，使其更像纯文本 */
+  /* Override TDesign Select styles to look like plain text */
   :deep(.t-select__wrap) {
     width: auto;
     
