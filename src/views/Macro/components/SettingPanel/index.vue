@@ -140,7 +140,8 @@ const resetMacro = () => {
   width: 100%;
   height: 100%;
   display: flex;
-  background-color: #dbe4ef; /* Matching the light blue-ish gray background from image */
+  background-color: #fff; /* White background to match other panels */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
   padding: 30px;
   box-sizing: border-box;
   gap: 40px;
@@ -178,13 +179,15 @@ const resetMacro = () => {
   background: #fff;
   width: 60px; /* Fixed width */
   height: 60px; /* Fixed height */
-  border-radius: 8px;
+  border-radius: 8px; /* Slightly larger radius than keycaps (6px) to fit size */
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  border: 1px solid rgba(0,0,0,0.1);
+  color: #333; /* Dark text */
 }
 
 .macro-item:hover {
@@ -193,8 +196,9 @@ const resetMacro = () => {
 }
 
 .macro-item.active {
-  background: #e6e6e6; /* Slight darken for active */
-  border: 2px solid #ccc;
+  background: #f5f5f5;
+  border: 2px solid #333;
+  box-shadow: 0 0 8px rgba(0,0,0,0.1);
 }
 
 .macro-badge {
@@ -215,8 +219,9 @@ const resetMacro = () => {
 
 .macro-name {
   font-size: 12px;
-  color: #333;
+  color: #333; /* Dark text */
   display: block; /* Show name */
+  font-weight: 600;
 }
 
 /* Config Section */
@@ -237,27 +242,35 @@ const resetMacro = () => {
 }
 
 .macro-type-selector {
-  display: flex;
+  display: inline-flex;
   background: #fff;
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   gap: 4px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
 .type-option {
-  flex: 1;
-  text-align: center;
-  padding: 6px 4px;
-  font-size: 12px;
-  border-radius: 4px;
+  padding: 8px 16px;
   cursor: pointer;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
   color: #666;
+  transition: all 0.2s;
+  user-select: none;
   white-space: nowrap;
+  flex: initial; /* Don't stretch */
+  text-align: center;
+}
+
+.type-option:hover {
+  background: #f5f5f5;
+  color: #333;
 }
 
 .type-option.active {
-  background: #333;
+  background: #222;
   color: #fff;
 }
 
@@ -339,26 +352,28 @@ const resetMacro = () => {
 
 .btn-action {
   padding: 8px 16px;
-  border: none;
+  border: 1px solid #d9d9d9;
   border-radius: 6px;
   font-size: 14px;
   cursor: pointer;
   font-weight: 500;
-  transition: opacity 0.2s;
-}
-
-.btn-record {
-  background: #222;
-  color: #fff;
-}
-
-.btn-reset {
+  transition: all 0.2s;
   background: #fff;
   color: #333;
 }
 
 .btn-action:hover {
-  opacity: 0.9;
+  background: #222;
+  color: #fff;
+  border-color: #222;
+}
+
+.btn-record {
+  /* Inherits defaults */
+}
+
+.btn-reset {
+  /* Inherits defaults */
 }
 
 .record-content {
