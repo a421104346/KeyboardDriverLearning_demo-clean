@@ -2,7 +2,7 @@
   <div class="setting-panel">
     <!-- Left: Macro List -->
     <div class="panel-section list-section">
-      <h3 class="section-title">宏列表</h3>
+      <h3 class="section-title">Macro List</h3>
       <div class="macro-grid">
         <div 
           v-for="i in 16" 
@@ -12,17 +12,17 @@
           @click="selectedMacro = i"
         >
           <div class="macro-badge">0</div>
-          <span class="macro-name">宏{{ i }}</span>
+          <span class="macro-name">Macro {{ i }}</span>
         </div>
       </div>
     </div>
 
     <!-- Middle: Macro Config -->
     <div class="panel-section config-section">
-      <h3 class="section-title">宏配置</h3>
+      <h3 class="section-title">Macro Config</h3>
       
       <div class="config-group">
-        <label>宏类型</label>
+        <label>Macro Type</label>
         <div class="macro-type-selector">
            <div 
              v-for="type in macroTypes" 
@@ -37,19 +37,19 @@
       </div>
 
       <div class="config-group">
-        <label>循环次数</label>
+        <label>Loop Count</label>
         <div class="number-control">
           <button class="btn-step" @click="adjust('loop', -1)">−</button>
           <div class="value-display">
              <input type="number" v-model.number="config.loop" min="1" />
-             <span class="unit">次</span>
+             <span class="unit">times</span>
           </div>
           <button class="btn-step" @click="adjust('loop', 1)">+</button>
         </div>
       </div>
       
       <div class="config-group">
-        <label>延迟时间</label>
+        <label>Delay Time</label>
         <div class="number-control">
           <button class="btn-step" @click="adjust('delay', -10)">−</button>
           <div class="value-display">
@@ -63,12 +63,12 @@
 
     <!-- Right: Macro Recording -->
     <div class="panel-section record-section">
-      <h3 class="section-title">宏录制</h3>
+      <h3 class="section-title">Macro Recording</h3>
       <div class="record-actions">
         <button class="btn-action btn-record" @click="toggleRecording">
-          {{ isRecording ? '停止录制' : '开始录制' }}
+          {{ isRecording ? 'Stop Recording' : 'Start Recording' }}
         </button>
-        <button class="btn-action btn-reset" @click="resetMacro">重置</button>
+        <button class="btn-action btn-reset" @click="resetMacro">Reset</button>
       </div>
       
       <div class="record-content">
@@ -79,8 +79,8 @@
               <polyline points="12 6 12 12 16 14"></polyline>
             </svg>
           </div>
-          <p class="main-text">暂无宏步骤</p>
-          <p class="sub-text">点击"开始录制"按钮开始录制宏</p>
+          <p class="main-text">No Macro Steps</p>
+          <p class="sub-text">Click "Start Recording" button to record macro</p>
         </div>
         <div v-else class="steps-list">
           <!-- TODO: Steps implementation -->
@@ -107,9 +107,9 @@ const config = reactive({
 });
 
 const macroTypes = [
-  { label: '无中断', value: 'no_interrupt' },
-  { label: '循环结束中断', value: 'interrupt_after_loop' },
-  { label: '马上中断', value: 'interrupt_immediately' }
+  { label: 'No Interrupt', value: 'no_interrupt' },
+  { label: 'Interrupt After Loop', value: 'interrupt_after_loop' },
+  { label: 'Interrupt Immediately', value: 'interrupt_immediately' }
 ];
 
 const adjust = (field: 'loop' | 'delay', delta: number) => {

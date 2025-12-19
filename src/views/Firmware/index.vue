@@ -9,25 +9,25 @@
             <path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M6 14h.01M10 14h.01M14 14h.01M18 14h.01" />
           </svg>
         </div>
-        <span class="card-title">当前设备</span>
+        <span class="card-title">Current Device</span>
       </div>
       
       <div class="device-info-grid">
         <div class="info-item">
-          <div class="label">设备名称</div>
+          <div class="label">Device Name</div>
           <div class="value primary-text">HM03</div>
         </div>
         <div class="info-item">
-          <div class="label">设备ID <CopyIcon class="copy-icon" /></div>
+          <div class="label">Device ID <CopyIcon class="copy-icon" /></div>
           <div class="value id-text">HPGPMOmXIPOfGfnLopKyRHfojmKjKM4o</div>
         </div>
         <div class="info-item">
-          <div class="label">当前版本</div>
+          <div class="label">Current Version</div>
           <div class="value link-text">V0.0.01</div>
         </div>
         <div class="info-item">
-          <div class="label">运行状态</div>
-          <div class="value success-text">APP模式_A分区</div>
+          <div class="label">Status</div>
+          <div class="value success-text">APP Mode_Partition A</div>
         </div>
       </div>
     </t-card>
@@ -45,8 +45,8 @@
             </svg>
           </div>
           <div class="header-text">
-            <div class="title">本地升级</div>
-            <div class="desc">从本地选择固件文件进行升级</div>
+            <div class="title">Local Upgrade</div>
+            <div class="desc">Select local firmware file to upgrade</div>
           </div>
         </div>
 
@@ -57,11 +57,11 @@
         <div class="actions">
           <t-button variant="outline" class="action-btn">
             <template #icon><UploadIcon /></template>
-            选择文件
+            Select File
           </t-button>
           <t-button theme="primary" class="action-btn start-btn">
             <template #icon><ArrowRightIcon /></template>
-            开始升级
+            Start Upgrade
           </t-button>
         </div>
       </t-card>
@@ -77,8 +77,8 @@
             </svg>
           </div>
           <div class="header-text">
-            <div class="title">在线升级</div>
-            <div class="desc">从服务器获取最新固件版本</div>
+            <div class="title">Online Upgrade</div>
+            <div class="desc">Get latest firmware version from server</div>
           </div>
         </div>
 
@@ -86,7 +86,7 @@
           <div class="version-item">
             <div class="version-left">
               <span class="version-number">v1.0.0</span>
-              <t-tag theme="primary" variant="light" size="small" class="new-tag">最新</t-tag>
+              <t-tag theme="primary" variant="light" size="small" class="new-tag">Latest</t-tag>
             </div>
             <div class="version-right">
               <span class="date">2025-01-01</span>

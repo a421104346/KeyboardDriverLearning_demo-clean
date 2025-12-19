@@ -7,7 +7,7 @@
           <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"/>
         </svg>
       </div>
-      <span class="title">系统设置</span>
+      <span class="title">System Settings</span>
     </div>
 
     <t-card :bordered="false" class="settings-card">
@@ -15,8 +15,8 @@
         <!-- 回报率设置 -->
         <div class="setting-item">
           <div class="info">
-            <div class="item-title">回报率设置</div>
-            <div class="item-desc">调整键盘的USB回报率，更高的回报率响应更快</div>
+            <div class="item-title">Polling Rate</div>
+            <div class="item-desc">Adjust USB polling rate, higher rate means faster response</div>
           </div>
           <div class="control">
             <t-select 
@@ -35,8 +35,8 @@
         <!-- 系统切换 -->
         <div class="setting-item">
           <div class="info">
-            <div class="item-title">系统切换</div>
-            <div class="item-desc">切换键盘的系统兼容模式</div>
+            <div class="item-title">System Switch</div>
+            <div class="item-desc">Switch keyboard system compatibility mode</div>
           </div>
           <div class="control">
             <t-select 
@@ -55,8 +55,8 @@
         <!-- WIN键锁定 -->
         <div class="setting-item">
           <div class="info">
-            <div class="item-title">WIN键锁定</div>
-            <div class="item-desc">锁定WIN键，防止游戏中误触</div>
+            <div class="item-title">Win Lock</div>
+            <div class="item-desc">Lock Windows key to prevent accidental presses in games</div>
           </div>
           <div class="control">
             <t-switch v-model="settings.winLock" size="large" />
@@ -68,8 +68,8 @@
         <!-- 全键锁定 -->
         <div class="setting-item">
           <div class="info">
-            <div class="item-title">全键锁定</div>
-            <div class="item-desc">锁定所有按键，防止误触</div>
+            <div class="item-title">Full Key Lock</div>
+            <div class="item-desc">Lock all keys to prevent accidental presses</div>
           </div>
           <div class="control">
             <t-switch v-model="settings.fullKeyLock" size="large" />
@@ -81,12 +81,12 @@
         <!-- 恢复出厂设置 -->
         <div class="setting-item">
           <div class="info">
-            <div class="item-title">恢复出厂设置</div>
-            <div class="item-desc">将键盘所有设置恢复到出厂默认状态，此操作不可撤销</div>
+            <div class="item-title">Factory Reset</div>
+            <div class="item-desc">Restore all settings to factory defaults, this action cannot be undone</div>
           </div>
           <div class="control">
             <t-button variant="outline" theme="danger" @click="handleReset">
-              恢复出厂
+              Reset
             </t-button>
           </div>
         </div>
@@ -117,7 +117,7 @@ const systemOptions = [
 ];
 
 const handleReset = () => {
-  MessagePlugin.success('已恢复出厂设置');
+  MessagePlugin.success('Factory reset successful');
   settings.reportRate = '8k';
   settings.systemMode = 'Windows';
   settings.winLock = false;

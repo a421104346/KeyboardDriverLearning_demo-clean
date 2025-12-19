@@ -1,10 +1,10 @@
 <template>
   <div class="calibration-panel">
     <div class="info">
-      <div class="title">校准</div>
-      <div class="description">校准键盘，以确保键盘的准确性和稳定性。</div>
+      <div class="title">Calibration</div>
+      <div class="description">Calibrate the keyboard to ensure accuracy and stability.</div>
     </div>
-    <t-button class="start-btn" @click="startCalibration">开始校准</t-button>
+    <t-button class="start-btn" @click="startCalibration">Start Calibration</t-button>
     
     <div class="calibration-display">
       <div class="ruler-container">
