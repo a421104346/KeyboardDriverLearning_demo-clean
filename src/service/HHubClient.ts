@@ -15,6 +15,9 @@ export class HHubClient {
    * 请求用户授权新设备 (WebHID)
    */
   async requestDevice(): Promise<boolean> {
+    if ((this.sdk as any).__isMock) {
+      return true;
+    }
     if (!('hid' in navigator)) {
       throw new Error('WebHID not supported');
     }

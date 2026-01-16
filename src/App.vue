@@ -15,7 +15,10 @@
       </nav>
 
       <div class="connection-status">
-        <span v-if="deviceStore.currentDevice" class="status-connected">● {{ deviceStore.currentDevice.name }}</span>
+        <span v-if="deviceStore.currentDevice" class="status-connected">
+          ● {{ deviceStore.currentDevice.name }}
+          <span v-if="deviceStore.isPreview" class="status-preview">Preview</span>
+        </span>
         <button v-if="deviceStore.currentDevice" @click="deviceStore.disconnect()" class="btn-disconnect">Disconnect</button>
       </div>
     </header>
@@ -33,7 +36,9 @@
       <div class="mascot-container">
         <div class="mascot">⌨️</div>
       </div>
-      <button @click="openScanModal" class="btn-authorize">Authorize device +</button>
+      <button v-if="deviceStore.isPreview" @click="enterPreview" class="btn-authorize">进入预览</button>
+      <button v-else @click="openScanModal" class="btn-authorize">Authorize device +</button>
+      <div v-if="deviceStore.isPreview" class="preview-hint">预览模式不需要第三方 SDK 或设备授权</div>
     </div>
 
     <!-- Device Selection Modal (Removed for cleaner UI) -->
@@ -75,6 +80,13 @@ const openScanModal = async () => {
     // Usually the one user just picked is at the end or we can just pick the first valid one
     // HSDK scan() replaces the list, so we pick the first available.
     await handleConnect(deviceStore.scannedDevices[0]);
+  }
+};
+
+const enterPreview = async () => {
+  await deviceStore.connectPreview();
+  if (deviceStore.isConnected) {
+    await lightingStore.readConfig();
   }
 };
 
@@ -155,6 +167,11 @@ const handleConnect = async (device: HHubDeviceInfo) => {
 }
 
 .status-connected { color: #4CAF50; }
+.status-preview {
+  margin-left: 8px;
+  font-size: 0.75rem;
+  color: #FFC107;
+}
 
 button {
   padding: 8px 16px;
@@ -213,6 +230,12 @@ button {
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.preview-hint {
+  margin-top: 12px;
+  font-size: 0.9rem;
+  color: #888;
 }
 
 .btn-authorize:hover {

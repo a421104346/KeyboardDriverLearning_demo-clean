@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { hHubClient } from '../service/HHubClient';
+import { isPreviewMode } from '../service';
 import type { DeviceConnectionState, HHubDeviceInfo } from '../types/device';
 import { ErrorCode } from '../types/error';
 import { useErrorStore } from './error'; // We'll create this next, but can reference it now
@@ -21,6 +22,7 @@ export const useDeviceStore = defineStore('device', () => {
   const isConnecting = computed(() => state.value === 'connecting');
   const isConnected = computed(() => state.value === 'connected');
   const canConnect = computed(() => ['idle', 'authorized', 'error'].includes(state.value));
+  const isPreview = computed(() => isPreviewMode);
 
   // Helper
   const addLog = (msg: string) => {
@@ -118,6 +120,23 @@ export const useDeviceStore = defineStore('device', () => {
   };
 
   /**
+   * Preview-only connect (no WebHID required)
+   */
+  const connectPreview = async () => {
+    try {
+      await scan();
+      if (scannedDevices.value.length === 0) {
+        throw new Error('No preview device available');
+      }
+      await connect(scannedDevices.value[0].id);
+    } catch (e: any) {
+      state.value = 'error';
+      error.value = e.message;
+      addLog(`Preview connect failed: ${e.message}`);
+    }
+  };
+
+  /**
    * Disconnect
    */
   const disconnect = async () => {
@@ -151,11 +170,13 @@ export const useDeviceStore = defineStore('device', () => {
     isConnecting,
     isConnected,
     canConnect,
+    isPreview,
     
     // Actions
     requestNew,
     scan,
     connect,
+    connectPreview,
     disconnect,
     addLog
   };

@@ -43,6 +43,32 @@ pnpm dev
 
 然后在浏览器中打开 `http://localhost:5173`
 
+### 预览模式（默认）
+
+公开仓库已移除第三方 SDK，默认使用 Mock 数据即可预览前端展示。
+
+1. 启动开发服务后进入首页
+2. 点击“进入预览”即可浏览各页面
+
+### 接入真实设备（私有环境）
+
+1. 在私有环境准备授权的 SDK，并通过全局变量注入：
+
+```html
+<script src="/path/to/hsdk.js"></script>
+<script>
+  window.__HSDK__ = { HSDK: window.HSDK };
+</script>
+```
+
+2. 在 `.env.local` 中启用 SDK：
+
+```bash
+VITE_SDK_ENABLED=true
+```
+
+> 公开仓库不包含 SDK 代码，避免第三方授权风险。
+
 ### 构建
 
 ```bash
@@ -51,9 +77,10 @@ pnpm build
 
 ## 📖 使用说明
 
-1. **连接设备**：点击 "Authorize device +"，选择你的键盘（需支持 H-Hub 协议）
-2. **Lighting 页面**：调整灯光开关、模式、亮度，选择颜色并点击按键应用
-3. **Key Test 页面**：开启测试模式，按下按键查看实时行程和触发状态
+1. **预览**：点击“进入预览”即可体验 UI（无需设备）
+2. **连接设备**：点击 "Authorize device +"，选择你的键盘（需支持 H-Hub 协议）
+3. **Lighting 页面**：调整灯光开关、模式、亮度，选择颜色并点击按键应用
+4. **Key Test 页面**：开启测试模式，按下按键查看实时行程和触发状态
 
 ## 🎯 支持的设备
 
@@ -78,14 +105,13 @@ src/
 ├── config/           # 配置文件
 │   ├── layout.ts     # 键盘布局
 │   └── keymap.ts     # 键码映射
-├── sdk/              # H-Hub SDK (预编译)
-└── service/          # SDK 实例化
+└── service/          # 设备服务（默认 Mock，可接入私有 SDK）
 ```
 
 ## ⚠️ 注意事项
 
 - **浏览器兼容性**：需要支持 WebHID API（Chrome/Edge 89+，Firefox 不支持）
-- **权限**：首次使用需授权设备访问
+- **权限**：连接真实设备时需授权设备访问
 - **设备支持**：仅支持使用 H-Hub 协议的键盘
 
 ## 📄 许可证
