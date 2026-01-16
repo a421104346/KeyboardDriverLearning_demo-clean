@@ -10,7 +10,6 @@
         <router-link to="/lighting" class="nav-item" active-class="active">Lighting</router-link>
         <router-link to="/macros" class="nav-item" active-class="active">Macros</router-link>
         <router-link to="/system" class="nav-item" active-class="active">System</router-link>
-        <router-link to="/configurations" class="nav-item" active-class="active">Configs</router-link>
         <router-link to="/firmware" class="nav-item" active-class="active">Firmware</router-link>
       </nav>
 

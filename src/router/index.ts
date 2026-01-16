@@ -8,7 +8,6 @@ const routes = [
   { path: '/advancedkeys', component: () => import('../views/AdvancedKeys/index.vue') },
   { path: '/macros', component: () => import('../views/Macro/index.vue') },
   { path: '/system', component: () => import('../views/System/index.vue') },
-  { path: '/configurations', component: () => import('../views/Configurations/index.vue') },
   { path: '/firmware', component: () => import('../views/Firmware/index.vue') },
 ];
 
