@@ -1,0 +1,32 @@
+/* Global Card Styles */
+.t-card,
+.setting-wrapper,
+.keyboard-wrapper,
+.device-card,
+.upgrade-card,
+.settings-card {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  border: 1px solid transparent;
+}
+
+/* Hover Effect - ONLY for specific elements now */
+/* Removed general application to .keyboard-wrapper and .setting-wrapper */
+
+.device-card:hover,
+.upgrade-card:hover,
+.settings-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08) !important;
+  border-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Specific tweaks for darker themes if needed */
+@media (prefers-color-scheme: dark) {
+  .device-card:hover,
+  .upgrade-card:hover,
+  .settings-card:hover {
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3) !important;
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+}
+

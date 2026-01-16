@@ -6,6 +6,8 @@ import router from './router'
 // 引入组件库全局样式资源
 import 'tdesign-vue-next/es/style/index.css';
 import './style.css'
+import './styles/buttons.css'
+import './styles/cards.css'
 
 import App from './App.vue'
 import animateStagger from './directives/animate-stagger'
