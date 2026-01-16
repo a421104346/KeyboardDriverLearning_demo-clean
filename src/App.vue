@@ -27,7 +27,11 @@
 
     <template v-if="deviceStore.currentDevice">
       <main class="main-content">
-        <router-view></router-view>
+        <router-view v-slot="{ Component }">
+          <transition name="panel-slide" mode="out-in">
+            <component :is="Component" :key="$route.fullPath" />
+          </transition>
+        </router-view>
       </main>
 
     </template>
@@ -193,7 +197,9 @@ button {
   overflow: hidden;
   min-height: 0; /* Allow flex shrinking */
   position: relative;
+  background-color: #f0f2f5;
 }
+
 
 .welcome-screen {
   flex: 1;

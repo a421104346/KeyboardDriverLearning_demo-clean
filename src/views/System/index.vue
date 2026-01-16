@@ -1,6 +1,6 @@
 <template>
-  <div class="system-page">
-    <div class="header">
+  <div class="system-page" v-animate-stagger>
+    <div class="header stagger-enter">
       <div class="icon-wrapper">
         <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
@@ -10,7 +10,7 @@
       <span class="title">System Settings</span>
     </div>
 
-    <t-card :bordered="false" class="settings-card">
+    <t-card :bordered="false" class="settings-card stagger-enter">
       <div class="setting-list">
         <!-- Polling Rate Settings -->
         <div class="setting-item">

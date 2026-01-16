@@ -3,9 +3,12 @@
     <div class="layer-switcher">
       <div class="switcher-capsule">
         <div class="layer-label">Layer</div>
+        <!-- Sliding Indicator -->
+        <div class="switcher-indicator" :style="indicatorStyle"></div>
         <button 
           v-for="(layer, index) in layers" 
           :key="index"
+          :ref="el => setButtonRef(el, index)"
           :class="{ active: currentLayer === index }"
           @click="$emit('update:currentLayer', index)"
         >
@@ -29,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref, watch, nextTick, onMounted } from 'vue';
 import StandardLayerPanel from './components/StandardLayerPanel.vue';
 import Fn1LayerPanel from './components/Fn1LayerPanel.vue';
 import Fn2LayerPanel from './components/Fn2LayerPanel.vue';
@@ -47,6 +50,46 @@ const props = defineProps<{
 defineEmits(['key-click', 'update:currentLayer']);
 
 const layers = ['Main', 'Fn1', 'Fn2', 'Fn3'];
+
+// --- Indicator Logic ---
+const buttonRefs = ref<(HTMLElement | null)[]>([]);
+const indicatorLeft = ref(0);
+const indicatorWidth = ref(0);
+const indicatorTop = ref(0);
+const indicatorHeight = ref(0);
+
+const setButtonRef = (el: any, index: number) => {
+  if (el) buttonRefs.value[index] = el;
+};
+
+const updateIndicator = () => {
+  const btn = buttonRefs.value[props.currentLayer];
+  if (btn) {
+    indicatorLeft.value = btn.offsetLeft;
+    indicatorTop.value = btn.offsetTop;
+    indicatorWidth.value = btn.offsetWidth;
+    indicatorHeight.value = btn.offsetHeight;
+  }
+};
+
+const indicatorStyle = computed(() => ({
+  transform: `translate(${indicatorLeft.value}px, ${indicatorTop.value}px)`,
+  width: `${indicatorWidth.value}px`,
+  height: `${indicatorHeight.value}px`
+}));
+
+// Watch for layer changes to move indicator
+watch(() => props.currentLayer, () => {
+  nextTick(updateIndicator);
+});
+
+// Initial update
+onMounted(() => {
+  nextTick(() => {
+    setTimeout(updateIndicator, 50);
+  });
+});
+// -----------------------
 
 const activeComponent = computed(() => {
   switch (props.currentLayer) {
@@ -95,6 +138,18 @@ const activeComponent = computed(() => {
   align-items: center;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   gap: 4px;
+  position: relative; /* Ensure relative positioning for indicator */
+}
+
+.switcher-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: #000;
+  border-radius: 20px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none; /* Let clicks pass through to buttons */
+  z-index: 1;
 }
 
 .layer-label {
@@ -104,27 +159,33 @@ const activeComponent = computed(() => {
   font-size: 0.9rem;
   text-align: center;
   width: 100%;
+  position: relative;
+  z-index: 2;
 }
 
 .switcher-capsule button {
   padding: 6px 16px;
-  border: none;
-  background: transparent;
+  border: none !important; /* Force override global styles */
+  box-shadow: none !important; /* Force override global styles */
+  background: transparent !important; /* Force override global styles unless active */
   border-radius: 20px;
   cursor: pointer;
   font-weight: 500;
-  color: #666;
-  transition: all 0.2s;
+  color: #666 !important;
+  transition: color 0.2s; /* Only animate color */
+  position: relative;
+  z-index: 2; /* Sit above indicator */
+  width: 100%; /* Ensure buttons take full width if needed */
 }
 
 .switcher-capsule button:hover {
-  background: #f5f5f5;
-  color: #333;
+  /* background: #f5f5f5 !important; Remove hover bg, use text color change or opacity */
+  color: #333 !important;
 }
 
 .switcher-capsule button.active {
-  background: #000;
-  color: #fff;
+  /* background: #000 !important; Handled by indicator */
+  color: #fff !important;
 }
 </style>
 

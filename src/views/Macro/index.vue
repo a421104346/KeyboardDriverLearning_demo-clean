@@ -1,7 +1,7 @@
 <template>
-  <div class="page-container">
+  <div class="page-container" v-animate-stagger>
     <div class="content-wrapper">
-      <div class="keyboard-wrapper">
+      <div class="keyboard-wrapper stagger-enter">
         <KeyboardPanel 
           :has-layout="isInitialized"
           :layout="K61_LAYOUT"
@@ -12,7 +12,7 @@
         />
       </div>
       
-      <div class="setting-wrapper">
+      <div class="setting-wrapper stagger-enter">
         <SettingPanel />
       </div>
     </div>
@@ -68,7 +68,7 @@ const handleKeyClick = ({ row, col }: { row: number, col: number }) => {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background-color: #f0f2f5;
+  background-color: transparent;
   display: flex;
   justify-content: center;
 }

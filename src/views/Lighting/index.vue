@@ -1,7 +1,7 @@
 <template>
-  <div class="page-container">
+  <div class="page-container" v-animate-stagger>
     <div class="content-wrapper">
-      <div class="keyboard-wrapper">
+      <div class="keyboard-wrapper stagger-enter">
         <KeyboardPanel 
           :layout="K61_LAYOUT" 
           :key-layout="keyLayout"
@@ -11,7 +11,7 @@
         />
       </div>
       
-      <div class="setting-wrapper">
+      <div class="setting-wrapper stagger-enter">
         <SettingPanel @apply-all="applyColorToAll" />
       </div>
     </div>
@@ -175,14 +175,14 @@ const applyColorToAll = async () => {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background-color: #f0f2f5; /* Light gray background like the screenshot */
+  background-color: transparent;
   display: flex;
   justify-content: center;
 }
 
 /* Dark mode override if the app is dark */
 :global(body) {
-  background-color: #f0f2f5;
+  background-color: transparent;
 }
 
 .content-wrapper {

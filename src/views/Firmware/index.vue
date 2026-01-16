@@ -1,7 +1,7 @@
 <template>
-  <div class="firmware-page">
+  <div class="firmware-page" v-animate-stagger>
     <!-- Top Section: Current Device -->
-    <t-card :bordered="false" class="device-card">
+    <t-card :bordered="false" class="device-card stagger-enter">
       <div class="card-header">
         <div class="icon-wrapper">
           <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -33,7 +33,7 @@
     </t-card>
 
     <!-- Bottom Section: Upgrades -->
-    <div class="upgrade-container">
+    <div class="upgrade-container stagger-enter">
       <!-- Local Upgrade -->
       <t-card :bordered="false" class="upgrade-card local-upgrade">
         <div class="card-header-with-desc">

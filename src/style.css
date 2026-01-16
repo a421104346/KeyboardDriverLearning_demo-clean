@@ -16,6 +16,7 @@ body {
   display: block; /* Changed for full layout control */
   min-width: 320px;
   min-height: 100vh;
+  overflow-x: hidden; /* Prevent horizontal scrollbars during animations */
 }
 
 #app {
@@ -24,4 +25,25 @@ body {
   margin: 0;
   padding: 0;
   text-align: center;
+}
+
+/* Panel Transition Styles (Content Slides Only) */
+.panel-slide-enter-active,
+.panel-slide-leave-active {
+  transition: all 0.35s ease-out;
+}
+
+.panel-slide-enter-from {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.panel-slide-leave-to {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+/* Initial state for staggered animation elements */
+.stagger-enter {
+  /* opacity: 0; */
 }

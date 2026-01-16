@@ -1,7 +1,7 @@
 <template>
-  <div class="page-container">
+  <div class="page-container" v-animate-stagger>
     <div class="content-wrapper">
-      <div class="keyboard-wrapper">
+      <div class="keyboard-wrapper stagger-enter">
         <KeyboardPanel 
           :key="refreshKey"
           :has-layout="isInitialized"
@@ -14,7 +14,7 @@
         />
       </div>
       
-      <div class="setting-wrapper">
+      <div class="setting-wrapper stagger-enter">
         <SettingPanel 
           :is-testing="isTesting"
           :max-travel="maxTravel"
@@ -179,7 +179,7 @@ onUnmounted(() => {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background-color: #f0f2f5;
+  background-color: transparent;
   display: flex;
   justify-content: center;
 }
