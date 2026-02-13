@@ -1,9 +1,15 @@
 // @ts-ignore
 import service from './index'; // The existing HSDK instance
-import { HHubDeviceInfo, FeatureSet } from '../types/device';
-import { KeyTravelData } from '../types/keytest';
+import { KeyboardDeviceInfo, FeatureSet } from '../types/device';
 
-export class HHubClient {
+interface KeyTravelData {
+  keyId: string;
+  keyName: string;
+  currentTravel: number;
+  isPressed: boolean;
+}
+
+export class KeyboardClient {
   private sdk = service;
   private cachedRows = 6;
   private cachedCols = 21;
@@ -12,7 +18,7 @@ export class HHubClient {
   private isKeyTesting = false;
 
   /**
-   * 请求用户授权新设备 (WebHID)
+   * Request user authorization for a new device (WebHID)
    */
   async requestDevice(): Promise<boolean> {
     if ((this.sdk as any).__isMock) {
@@ -29,21 +35,21 @@ export class HHubClient {
   }
 
   /**
-   * 获取所有已授权/可用的设备
+   * Get all authorized/available devices
    */
-  async getDevices(): Promise<HHubDeviceInfo[]> {
+  async getDevices(): Promise<KeyboardDeviceInfo[]> {
     const devices = await this.sdk.getDevices();
     return devices.map((d: any) => this.mapToDeviceInfo(d));
   }
 
   /**
-   * 连接指定设备
+   * Connect to a specific device
    */
-  async connect(deviceId: string): Promise<HHubDeviceInfo> {
+  async connect(deviceId: string): Promise<KeyboardDeviceInfo> {
     const devices = await this.sdk.getDevices();
-    // 兼容不同的对象结构 (HSDK 似乎有时返回包装对象，有时直接返回)
-    const target = devices.find((d: any) => 
-      String(d.productId) === deviceId || 
+    // Compatible with different object structures (HSDK may return wrapped or direct objects)
+    const target = devices.find((d: any) =>
+      String(d.productId) === deviceId ||
       String(d.device?.productId) === deviceId ||
       String(d.id) === deviceId
     );
@@ -59,11 +65,11 @@ export class HHubClient {
       throw new Error('Connection failed');
     }
 
-    // 连接成功后，获取完整信息
+    // After successful connection, fetch full device info
     const info = await this.sdk.getDeviceInfo();
     const deviceInfo = this.mapToDeviceInfo(target);
     
-    // 合并固件版本等详细信息
+    // Merge detailed info such as firmware version
     deviceInfo.version = info.fwVersion || 'Unknown';
     if (info.keyboardSN) deviceInfo.serialNumber = info.keyboardSN;
 
@@ -75,7 +81,7 @@ export class HHubClient {
   }
 
   /**
-   * 断开连接
+   * Disconnect
    */
   async disconnect(): Promise<void> {
     this.stopKeyTest();
@@ -83,20 +89,20 @@ export class HHubClient {
   }
 
   /**
-   * 获取键盘布局矩阵
+   * Get keyboard layout matrix
    */
   async getLayout(rows: number, cols: number): Promise<number[][]> {
-    // 这里的 0 是 layerIndex? 之前 store 里传的是 0
+    // The 0 here is layerIndex; the store previously passed 0 as well
     return await this.sdk.getLayout(0, rows, cols);
   }
 
   /**
-   * 内部方法：将 SDK 的设备对象映射为标准类型
+   * Internal helper: map SDK device object to the standard type
    */
-  private mapToDeviceInfo(sdkDevice: any): HHubDeviceInfo {
+  private mapToDeviceInfo(sdkDevice: any): KeyboardDeviceInfo {
     const raw = sdkDevice.device || sdkDevice;
     
-    // 默认特性集，后续可以根据 deviceId 或 info 动态调整
+    // Default feature set; can be adjusted dynamically by deviceId or info
     const features: FeatureSet = {
       lighting: true,
       keyTest: true,
@@ -109,7 +115,7 @@ export class HHubClient {
       name: raw.productName || 'Unknown Device',
       vendorId: raw.vendorId,
       productId: raw.productId,
-      version: 'Unknown', // 连接后更新
+      version: 'Unknown', // Updated after connection
       supportedFeatures: features,
       _raw: sdkDevice
     };
@@ -133,40 +139,40 @@ export class HHubClient {
 
   private async pollKeyTest() {
     while (this.isKeyTesting) {
-       try {
-         const travelMatrix = await this.sdk.getRealTimeTravel(this.cachedRows, this.cachedCols);
-         // Convert to KeyTravelData[]
-         const data: KeyTravelData[] = [];
-         
-         if (travelMatrix) {
-             travelMatrix.forEach((row: number[], r: number) => {
-                 row.forEach((val: number, c: number) => {
-                     // val is likely 0-400 (for 4.00mm) or similar.
-                     // Just pass raw for now, let store/component handle normalization if needed.
-                     // Assuming val > 0 implies some press.
-                     data.push({
-                         keyId: `${r}-${c}`,
-                         keyName: '',
-                         currentTravel: val,
-                         isPressed: val > 20 // Arbitrary threshold for "Pressed" boolean
-                     });
-                 });
-             });
-             
-             if (this.keyTestCallback) {
-                 this.keyTestCallback(data);
-             }
-         }
-       } catch (e) {
-           console.error('KeyTest poll error', e);
-           await new Promise(r => setTimeout(r, 1000));
-       }
-       // Minimal delay to yield event loop
-       await new Promise(r => setTimeout(r, 10)); 
+      try {
+        const travelMatrix = await this.sdk.getRealTimeTravel(this.cachedRows, this.cachedCols);
+        // Convert to KeyTravelData[]
+        const data: KeyTravelData[] = [];
+        
+        if (travelMatrix) {
+          travelMatrix.forEach((row: number[], r: number) => {
+            row.forEach((val: number, c: number) => {
+              // val is likely 0-400 (for 4.00mm) or similar.
+              // Just pass raw for now, let store/component handle normalization if needed.
+              // Assuming val > 0 implies some press.
+              data.push({
+                keyId: `${r}-${c}`,
+                keyName: '',
+                currentTravel: val,
+                isPressed: val > 20 // Arbitrary threshold for "Pressed" boolean
+              });
+            });
+          });
+          
+          if (this.keyTestCallback) {
+            this.keyTestCallback(data);
+          }
+        }
+      } catch (e) {
+        console.error('KeyTest poll error', e);
+        await new Promise(r => setTimeout(r, 1000));
+      }
+      // Minimal delay to yield event loop
+      await new Promise(r => setTimeout(r, 10));
     }
   }
 
-  // --- 代理 SDK 的其他方法 ---
+  // --- Proxy methods for other SDK APIs ---
 
   async getDeviceInfo() {
     return await this.sdk.getDeviceInfo();
@@ -219,4 +225,4 @@ export class HHubClient {
   }
 }
 
-export const hHubClient = new HHubClient();
+export const keyboardClient = new KeyboardClient();

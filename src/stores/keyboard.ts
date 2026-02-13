@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import type { KeyData } from '../types/keyboard';
-import { hHubClient } from '../service/HHubClient';
+import { keyboardClient } from '../service/KeyboardClient';
 import { useDeviceStore } from './device';
 import { usePerformanceStore } from './performance';
 
@@ -61,7 +61,7 @@ export const useKeyboardStore = defineStore('keyboard', () => {
       // 2. Load Device Capabilities (Performance metadata)
       // Getting precision/axes first is often required to interpret key data correctly
       await performanceStore.getPrecision();
-      // Fire getSupportAxis without waiting (non-blocking, like H-Hub does)
+      // Fire getSupportAxis without waiting (non-blocking, matching production behavior)
       // This prevents timeout from blocking the main init flow
       performanceStore.getSupportAxis(); // No await!
       initProgress.value = 50;
@@ -96,10 +96,10 @@ export const useKeyboardStore = defineStore('keyboard', () => {
       }
 
       // Fetch Layout (with caching check from deviceStore if desired)
-      // For simplicity, we fetch fresh here, or rely on hHubClient caching if implemented
+      // For simplicity, we fetch fresh here, or rely on keyboardClient caching if implemented
       let layoutData = deviceStore.keyLayout;
       if (!layoutData || layoutData.length === 0) {
-         layoutData = await hHubClient.getLayout(rows, cols);
+         layoutData = await keyboardClient.getLayout(rows, cols);
          // Update device store cache
          deviceStore.keyLayout = layoutData;
       }

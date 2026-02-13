@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { ref, watch } from 'vue';
 import { useKeyboardStore } from './keyboard';
 import { useDeviceStore } from './device';
-import { hHubClient } from '../service/HHubClient';
+import { keyboardClient } from '../service/KeyboardClient';
 import type { KeyData, AxisInfo } from '../types/keyboard';
 
 export const usePerformanceStore = defineStore('performance', () => {
@@ -37,7 +37,7 @@ export const usePerformanceStore = defineStore('performance', () => {
   const getPrecision = async () => {
     try {
       // TODO: Implement actual API call if available
-      // const res = await hHubClient.getPrecision();
+      // const res = await keyboardClient.getPrecision();
       // precision.value = res.precision;
       precision.value = 0.1; // Default fallback
     } catch (e) {
@@ -59,7 +59,7 @@ export const usePerformanceStore = defineStore('performance', () => {
           await new Promise(resolve => setTimeout(resolve, retryDelay));
         }
 
-        const axisData = await hHubClient.getSupportAxis();
+        const axisData = await keyboardClient.getSupportAxis();
         console.log('getSupportAxis response:', axisData);
         
         // SDK returns { axisCount, axisList }
@@ -125,15 +125,15 @@ export const usePerformanceStore = defineStore('performance', () => {
     const cols = keyboardMatrix[0].length;
     let count = 0;
 
-    // Use a batch approach or simple loop. 
-    // H-Hub loops, so we loop.
+    // Use a batch approach or simple loop.
+    // Production implementations typically loop per key, so we keep that behavior.
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
         const key = keyboardMatrix[r]?.[c];
         if (!key || key.keyValue[0] === 0) continue;
 
         try {
-          const data = await hHubClient.getKeyPerformance(r, c);
+          const data = await keyboardClient.getKeyPerformance(r, c);
           if (data) {
             Object.assign(key, {
               travel: data.travel,
@@ -218,7 +218,7 @@ export const usePerformanceStore = defineStore('performance', () => {
         };
 
         // 2. Update Device
-        await hHubClient.setKeyPerformance(r, c, payload);
+        await keyboardClient.setKeyPerformance(r, c, payload);
 
         // 3. Update Store State
         Object.assign(key, payload);

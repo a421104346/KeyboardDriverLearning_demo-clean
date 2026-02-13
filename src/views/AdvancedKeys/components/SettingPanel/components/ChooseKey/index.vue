@@ -18,7 +18,7 @@
       <div class="choose-key-list">
         <Key 
           v-for="item in currentKeyList" 
-          :key="item.name || item.value" 
+          :key="'name' in item ? item.name : item.value"
           :key-data="item"
         />
       </div>

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { hHubClient } from '../service/HHubClient';
+import { keyboardClient } from '../service/KeyboardClient';
 import { useDeviceStore } from './device';
 import { asyncThrottle } from '../utils/throttle';
 
@@ -13,19 +13,19 @@ import k84 from '../assets/layouts/k84.json';
 export interface LightAreaData {
   lightAreaInfo: any; // LightAreaSizeInfo
   lightConfig: any; // LightConfigInfo
-  colorPanelHex: string[]; // 调色盘 HEX 值
-  colorID: number; // 当前选中的调色盘 ID
-  lightAreaRGB: any[][]; // 自定义灯效数据 [row][col]
+  colorPanelHex: string[]; // Palette HEX values
+  colorID: number; // Currently selected palette ID
+  lightAreaRGB: any[][]; // Custom lighting effect data [row][col]
 }
 
 export const useLightingStore = defineStore('lighting', () => {
   const deviceStore = useDeviceStore();
   
-  // 支持多个灯光区域（目前主要使用 areaID 0）
+  // Supports multiple lighting areas (currently mainly areaID 0)
   const lightConfigs = ref<LightAreaData[]>([]);
   const currentLightArea = ref(0);
   
-  // 向后兼容的简化接口
+  // Backward-compatible simplified interface
   const lightConfig = computed(() => {
     const area = lightConfigs.value.find(a => a.lightAreaInfo?.areaID === currentLightArea.value);
     return area?.lightConfig || {
@@ -42,12 +42,12 @@ export const useLightingStore = defineStore('lighting', () => {
 
   // Throttled Send Functions
   const sendConfig = asyncThrottle(async (config: any) => {
-    await hHubClient.setLightConfigInfo(config);
+    await keyboardClient.setLightConfigInfo(config);
     deviceStore.addLog('Config updated (throttled).');
   }, 100);
 
   const sendColorPanel = asyncThrottle(async (areaId: number, colors: any[]) => {
-    await hHubClient.setColorPanel(areaId, colors);
+    await keyboardClient.setColorPanel(areaId, colors);
     deviceStore.addLog('Color panel updated (throttled).');
   }, 100);
 
@@ -64,10 +64,10 @@ export const useLightingStore = defineStore('lighting', () => {
      deviceStore.addLog(`Layout loaded for ID ${layoutID}`);
   };
 
-  // 初始化灯光区域（参考 H-Hub）
+  // Initialize lighting areas (aligned with production app behavior)
   const initLightArea = async () => {
     try {
-      const areas = await hHubClient.getLightArea();
+      const areas = await keyboardClient.getLightArea();
       if (!areas || areas.length === 0) {
         deviceStore.addLog('No light areas found');
         return;
@@ -80,19 +80,19 @@ export const useLightingStore = defineStore('lighting', () => {
         const lightAreaInfo = areas[i];
         if (!lightAreaInfo) continue;
 
-        const config = await hHubClient.getLightConfigInfo(lightAreaInfo.areaID);
+        const config = await keyboardClient.getLightConfigInfo(lightAreaInfo.areaID);
         
-        // 获取调色盘
-        const colorPanel = await hHubClient.getColorPanel(lightAreaInfo.areaID);
+        // Get color palette
+        const colorPanel = await keyboardClient.getColorPanel(lightAreaInfo.areaID);
         const colorPanelHex = colorPanel.colorList.map((item: any) => {
           return `#${item.r.toString(16).padStart(2, '0')}${item.g.toString(16).padStart(2, '0')}${item.b.toString(16).padStart(2, '0')}`;
         });
 
-        // 获取当前 colorID
-        const colorIDResult = await hHubClient.getColorID(lightAreaInfo.areaID);
+        // Get current colorID
+        const colorIDResult = await keyboardClient.getColorID(lightAreaInfo.areaID);
 
-        // 初始化 RGB 矩阵
-        // 尝试保留现有的 RGB 数据以防止页面切换时丢失
+        // Initialize RGB matrix
+        // Try to preserve existing RGB data to avoid losing state on page switches
         const existingArea = lightConfigs.value.find(a => a.lightAreaInfo?.areaID === lightAreaInfo.areaID);
         let lightAreaRGB: any[][];
 
@@ -133,7 +133,7 @@ export const useLightingStore = defineStore('lighting', () => {
     }
   };
 
-  // 更新配置（不改变 mode，除非明确指定）
+  // Update configuration (do not change mode unless explicitly specified)
   const updateConfig = async (newConfig: any, preserveMode = false) => {
     try {
       const area = lightConfigs.value.find(a => a.lightAreaInfo?.areaID === currentLightArea.value);
@@ -142,7 +142,7 @@ export const useLightingStore = defineStore('lighting', () => {
         return;
       }
 
-      // 如果 preserveMode 为 true，保持当前 mode
+      // If preserveMode is true, keep current mode
       if (preserveMode && area.lightConfig) {
         newConfig = { ...newConfig, mode: area.lightConfig.mode };
       }
@@ -157,7 +157,7 @@ export const useLightingStore = defineStore('lighting', () => {
     }
   };
 
-  // 设置 RGB（只在 Static/Custom 模式下有效）
+  // Set RGB (only valid in Static/Custom mode)
   // Not throttled to prevent dropping points during rapid interactions
   const setRGB = async (points: any[]) => {
     try {
@@ -167,22 +167,22 @@ export const useLightingStore = defineStore('lighting', () => {
         return;
       }
 
-      // 检查当前模式：只有 mode 0 (Static/Custom) 才能设置 RGB
+      // Check current mode: only mode 0 (Static/Custom) can set RGB
       if (area.lightConfig.mode !== 0) {
         deviceStore.addLog(`Cannot set RGB in mode ${area.lightConfig.mode}. Please switch to Static/Custom mode first.`);
         return;
       }
 
-      // 确保灯光是开启的
+      // Ensure lighting is enabled
       if (!area.lightConfig.open) {
         deviceStore.addLog('Light is off. Turning on...');
         await updateConfig({ open: true }, true);
       }
 
       // Direct send for responsiveness on single clicks/drags
-      await hHubClient.setLightAreaRGB(currentLightArea.value, points);
+      await keyboardClient.setLightAreaRGB(currentLightArea.value, points);
       
-      // 更新本地 RGB 数据
+      // Update local RGB data
       points.forEach((point: any) => {
         if (area.lightAreaRGB[point.position.row] && area.lightAreaRGB[point.position.row][point.position.col]) {
           area.lightAreaRGB[point.position.row][point.position.col] = point.rgb;
@@ -195,7 +195,7 @@ export const useLightingStore = defineStore('lighting', () => {
     }
   };
 
-  // 设置调色盘颜色
+  // Set palette colors
   const setColorPanel = async (colors: {r: number, g: number, b: number}[]) => {
     try {
       const area = lightConfigs.value.find(a => a.lightAreaInfo?.areaID === currentLightArea.value);
@@ -213,13 +213,13 @@ export const useLightingStore = defineStore('lighting', () => {
     }
   };
 
-  // 设置 colorID
+  // Set colorID
   const setColorID = async (id: number) => {
     try {
       const area = lightConfigs.value.find(a => a.lightAreaInfo?.areaID === currentLightArea.value);
       if (!area) return;
 
-      await hHubClient.setColorID(currentLightArea.value, id);
+      await keyboardClient.setColorID(currentLightArea.value, id);
       area.colorID = id;
       deviceStore.addLog(`ColorID set to ${id}`);
     } catch (e: any) {
@@ -228,13 +228,13 @@ export const useLightingStore = defineStore('lighting', () => {
   };
 
   return {
-    // 新接口
+    // New interface
     lightConfigs,
     currentLightArea,
     initLightArea,
     setColorPanel,
     setColorID,
-    // 向后兼容接口
+    // Backward-compatible interface
     lightConfig,
     selectedColor,
     lightAreas,

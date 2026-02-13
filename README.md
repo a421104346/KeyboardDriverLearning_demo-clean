@@ -1,93 +1,129 @@
-# H-Hub Web Demo
+# Morkblade Keyboard Driver Internship Project
 
-🎮 一个基于 WebHID 的键盘驱动管理面板演示，采用 Vue 3 + TypeScript 构建，支持暗色主题与流畅的交互动画。
+A web-based keyboard driver management panel built with Vue 3 + TypeScript.
+This repository is an internship project built for Morkblade, and supports both real WebHID devices and a built-in preview mode.
 
-> **注意**：本项目移除了第三方 SDK 依赖，**默认开启预览模式**，无需真实设备即可体验所有 UI 交互与动画效果。
+> This public repository runs in **preview mode by default** (no private SDK required), so you can explore the full interface without physical hardware.
 
-## ✨ 核心特性
+## Features
 
-- 🌈 **预览模式**：内置 Mock 数据服务，无设备/SDK 也能浏览全部功能
-- 🎨 **现代 UI**：VIA 风格暗色主题，支持 GSAP 驱动的平滑过渡动画
-- ⚡ **高性能**：
-  - 基于 CSS Transform 的流畅列表动画
-  - 独立的渲染与设置区域，背景常驻不闪烁
-  - 优化的 DOM 结构，分离键盘与设置面板
-- 🧩 **功能模块**：
-  - **Key Performance**：Rapid Trigger (RT)、死区调节、预设轮播
-  - **Key Assignment**：层级切换 (Fn1/Fn2/Fn3)、键位映射
-  - **Advanced Keys**：SOCD、Mod Tap、DKS 等高级键位设置
-  - **Lighting**：RGB 灯光控制、模式切换
-  - **Firmware**：固件版本信息与升级界面（演示）
+- **Preview-first experience**
+  - Built-in mock service with device/performance/lighting data
+  - Fully usable without device authorization
+- **WebHID-ready architecture**
+  - Real device flow via WebHID when SDK is enabled
+  - Pluggable service abstraction (`MockService` vs real SDK)
+- **Modular keyboard management pages**
+  - `Key Performance`: travel, Rapid Trigger (RT), dead-zone tuning, live key test
+  - `Key Assignment`: layered mapping UI (standard/Fn1/Fn2/Fn3)
+  - `Advanced Keys`: SOCD, Mod Tap, DKS, toggle-style advanced behavior panels
+  - `Lighting`: per-key RGB, dynamic modes, palette management
+  - `Macros`: macro keyboard and setting panel (UI demo state)
+  - `System`: polling rate / lock options (UI demo state)
+  - `Firmware`: firmware info and upgrade UI (demo state)
+- **Smooth interaction**
+  - GSAP stagger animations
+  - Separated keyboard/rendering panels for consistent transitions
 
-## 🛠️ 技术栈
+## Tech Stack
 
-- **框架**：Vue 3 (Composition API) + TypeScript
-- **构建**：Vite
-- **状态管理**：Pinia
-- **路由**：Vue Router
-- **UI 组件**：TDesign Vue Next
-- **动画**：GSAP + CSS Transitions
-- **图表**：ECharts (用于死区/RT可视化)
+- **Framework**: Vue 3 (Composition API) + TypeScript
+- **Build Tool**: Vite
+- **State Management**: Pinia
+- **Routing**: Vue Router
+- **UI Library**: TDesign Vue Next
+- **Animation**: GSAP + CSS transitions
+- **Charts / Utilities**: ECharts, VueUse, Vue I18n
 
-## 🚀 快速开始
+## Getting Started
 
-### 1. 安装依赖
+### 1) Install dependencies
 
 ```bash
 pnpm install
-# 或 npm install
+# or
+npm install
 ```
 
-### 2. 启动开发服
+### 2) Run development server
 
 ```bash
 pnpm dev
 ```
 
-浏览器打开 `http://localhost:5173`，点击首页的 **"进入预览"** 即可开始体验。
+Open `http://localhost:5173` and click **"Enter Preview"** on the welcome screen.
 
-### 3. 构建项目
+### 3) Build for production
 
 ```bash
 pnpm build
 ```
 
-## 🔌 真实设备接入（可选）
+### 4) Preview production build
 
-本项目设计为可插拔 SDK 架构。如需接入真实硬件：
-
-1.  在 `src/sdk/` 目录下放置你的硬件 SDK
-2.  配置 `.env.local` 开启 SDK 模式：
-    ```bash
-    VITE_SDK_ENABLED=true
-    ```
-3.  在 `src/service/index.ts` 中取消注释并注入真实 SDK 实例
-
-> 公开仓库不包含私有 SDK 代码。
-
-## 📂 项目结构
-
+```bash
+pnpm preview
 ```
+
+## Device Modes
+
+### Default: Preview mode
+
+- Automatically enabled when no real SDK is injected
+- Uses `src/service/mockService.ts`
+- Safe for UI development and interaction testing
+
+### Optional: Real device mode
+
+To connect actual hardware, provide your SDK and enable SDK mode:
+
+1. Inject your SDK on `globalThis.__HSDK__` (project-specific integration)
+2. Create `.env.local`:
+
+```bash
+VITE_SDK_ENABLED=true
+```
+
+3. Start the app and use the WebHID authorization flow
+
+Current filter values in the service layer:
+
+- `vendorId`: `0x34b7`
+- `productId`: `0xffff`
+- `usagePage`: `0xff00`
+- `usage`: `0x01`
+
+## Project Structure
+
+```text
 src/
-├── assets/           # 静态资源 (Logo, SVG)
-├── components/       # 公共组件 (Keyboard, Modal)
-├── config/           # 静态配置 (键位表, 布局)
-├── directives/       # 自定义指令 (v-animate-stagger)
-├── router/           # 路由定义
-├── service/          # 设备服务层 (含 MockService)
-├── stores/           # Pinia 状态管理
-├── styles/           # 全局样式 (Buttons, Cards)
-├── types/            # TypeScript 类型定义
-└── views/            # 页面视图
-    ├── KeyPerformance # 性能设置 (RT, 死区)
-    ├── KeyAssignment  # 改键 (分层)
-    ├── AdvancedKeys   # 高级键位 (SOCD, DKS)
-    ├── Lighting       # 灯光控制
-    └── Firmware       # 固件管理
+├── assets/              # Static resources and keyboard layout JSON
+├── components/          # Shared components (keyboard, alerts, etc.)
+├── config/              # Key map and visual keyboard layout config
+├── directives/          # Custom directives (stagger animation)
+├── router/              # Route definitions
+├── service/             # Service layer (mock + SDK client wrapper)
+├── stores/              # Pinia stores (device/keyboard/performance/lighting)
+├── styles/              # Global styles
+├── types/               # TypeScript type declarations
+└── views/               # Feature pages
+    ├── KeyPerformance/
+    ├── KeyAssignment/
+    ├── AdvancedKeys/
+    ├── Lighting/
+    ├── Macro/
+    ├── System/
+    └── Firmware/
 ```
 
-## 📄 许可证
+## Notes
 
-MIT License
+- This repository intentionally excludes private third-party SDK source code.
+- Several pages (such as Firmware/System/Macro) are currently focused on UI/interaction demonstration.
 
-界面设计参考了 [H-Hub](https://github.com/xingjiu666/H-Hub) 与 VIA。
+## License
+
+MIT
+
+Project context:
+Built as an internship project for Morkblade, with UI patterns inspired by VIA.

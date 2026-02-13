@@ -3,7 +3,7 @@ import { createPinia } from 'pinia'
 import TDesign from 'tdesign-vue-next';
 import router from './router'
 
-// 引入组件库全局样式资源
+// Import global styles from the component library
 import 'tdesign-vue-next/es/style/index.css';
 import './style.css'
 import './styles/buttons.css'

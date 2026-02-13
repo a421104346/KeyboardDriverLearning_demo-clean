@@ -33,7 +33,7 @@
 - `src/components/`: UI components.
 - `src/views/`: Main views.
 
-## Key Information from H-Hub
+## Device Protocol Reference
 - Vendor ID: 0x34b7
 - Product ID: 0xffff
 - Usage Page: 0xff00

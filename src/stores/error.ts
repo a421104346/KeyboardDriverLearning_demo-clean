@@ -7,7 +7,7 @@ export const useErrorStore = defineStore('error', () => {
 
   const addError = (error: AppError) => {
     errors.value.push(error);
-    // 3 秒后自动移除
+    // Auto-remove after 3 seconds
     setTimeout(() => {
       errors.value.shift();
     }, 3000);

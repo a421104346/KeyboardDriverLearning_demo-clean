@@ -123,11 +123,9 @@ const startPolling = () => {
       const triggerData = await service.getKeyTriggerState(rows, cols);
       
       let currentMax = 0;
-      let maxRow = -1;
-      let maxCol = -1;
       
-      travelData.forEach((rowVals, rIndex) => {
-        rowVals.forEach((val, cIndex) => {
+      travelData.forEach((rowVals: number[], rIndex: number) => {
+        rowVals.forEach((val: number, cIndex: number) => {
           const keyId = `${rIndex},${cIndex}`;
           
           // Check if valid key in keyboard store
@@ -136,8 +134,6 @@ const startPolling = () => {
           
           if (val > currentMax) {
             currentMax = val;
-            maxRow = rIndex;
-            maxCol = cIndex;
           }
           
           if (triggerData[rIndex] && triggerData[rIndex][cIndex] > 0) {

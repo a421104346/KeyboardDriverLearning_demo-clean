@@ -1,4 +1,4 @@
-// K61 Layout Configuration (from H-Hub)
+// K61 layout configuration
 export const K61_LAYOUT = [
     [
       { "x": 0, "y": 0, "w": 1, "h": 1 },

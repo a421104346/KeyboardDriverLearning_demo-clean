@@ -48,7 +48,7 @@ import SwitchPanel from './components/SwitchPanel.vue';
 import CalibrationPanel from './components/CalibrationPanel.vue';
 
 // Define props to match the original SettingPanel interface
-const props = defineProps<{
+defineProps<{
   isTesting: boolean;
   maxTravel: number;
   isLoading: boolean;

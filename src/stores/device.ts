@@ -1,16 +1,14 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { hHubClient } from '../service/HHubClient';
+import { keyboardClient } from '../service/KeyboardClient';
 import { isPreviewMode } from '../service';
-import type { DeviceConnectionState, HHubDeviceInfo } from '../types/device';
-import { ErrorCode } from '../types/error';
-import { useErrorStore } from './error'; // We'll create this next, but can reference it now
+import type { DeviceConnectionState, KeyboardDeviceInfo } from '../types/device';
 
 export const useDeviceStore = defineStore('device', () => {
   // State Machine
   const state = ref<DeviceConnectionState>('idle');
-  const currentDevice = ref<HHubDeviceInfo | null>(null);
-  const scannedDevices = ref<HHubDeviceInfo[]>([]);
+  const currentDevice = ref<KeyboardDeviceInfo | null>(null);
+  const scannedDevices = ref<KeyboardDeviceInfo[]>([]);
   const error = ref<string | null>(null);
 
   // Device Details (cached after connection)
@@ -35,7 +33,7 @@ export const useDeviceStore = defineStore('device', () => {
   const requestNew = async () => {
     state.value = 'authorizing';
     try {
-      const authorized = await hHubClient.requestDevice();
+      const authorized = await keyboardClient.requestDevice();
       if (authorized) {
         state.value = 'authorized';
         await scan();
@@ -55,7 +53,7 @@ export const useDeviceStore = defineStore('device', () => {
    */
   const scan = async () => {
     try {
-      const devices = await hHubClient.getDevices();
+      const devices = await keyboardClient.getDevices();
       scannedDevices.value = devices;
       addLog(`Scanned ${devices.length} devices`);
       if (devices.length > 0 && state.value === 'idle') {
@@ -76,12 +74,12 @@ export const useDeviceStore = defineStore('device', () => {
     addLog(`Connecting to ${deviceId}...`);
 
     try {
-      const device = await hHubClient.connect(deviceId);
+      const device = await keyboardClient.connect(deviceId);
       currentDevice.value = device;
       
       // Load initial data
       try {
-        const info = await hHubClient.getDeviceInfo();
+        const info = await keyboardClient.getDeviceInfo();
         deviceInfo.value = info;
         
         // Update device version info
@@ -92,10 +90,10 @@ export const useDeviceStore = defineStore('device', () => {
 
         const rows = info.row || 5;
         const cols = info.col || 14;
-        keyLayout.value = await hHubClient.getLayout(rows, cols);
+        keyLayout.value = await keyboardClient.getLayout(rows, cols);
         
         try {
-            supportedAxes.value = await hHubClient.getSupportAxis();
+            supportedAxes.value = await keyboardClient.getSupportAxis();
         } catch (e) {
             console.warn('Axis support check failed', e);
         }
@@ -142,7 +140,7 @@ export const useDeviceStore = defineStore('device', () => {
   const disconnect = async () => {
     state.value = 'disconnecting';
     try {
-      await hHubClient.disconnect();
+      await keyboardClient.disconnect();
     } catch (e) {
       console.warn('Disconnect error', e);
     } finally {

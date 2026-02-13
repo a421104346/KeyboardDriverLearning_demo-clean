@@ -71,7 +71,7 @@
 /**
  * [Resume/Portfolio Note] Explanation of Data Loading Behavior
  * 
- * In a complete production environment (like H-Hub), fetching switch options involves:
+ * In a complete production environment, fetching switch options involves:
  * 1. Firmware Layer: Sending `getSupportAxis` HID command to retrieve supported Switch IDs.
  * 2. Service Layer: Calling a backend API to map IDs to detailed metadata (Names, Images, Specs).
  * 

@@ -45,7 +45,7 @@ const keyLayout = computed(() => {
   
   const layer = Number(currentLayer.value);
   
-  return keyboardStore.keyboard.map((row, rIndex) => row.map((k, cIndex) => {
+  return keyboardStore.keyboard.map((row) => row.map((k) => {
     // --- FORCE MOCK FOR LAYERS ---
     
     // Layer 1 (Fn1): Ensure keys are rendered

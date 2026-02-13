@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <header class="header">
-      <div class="logo">H-Hub Web Demo</div>
+      <div class="logo">Morkblade Keyboard Demo</div>
       
       <nav v-if="deviceStore.currentDevice" class="nav-menu">
         <router-link to="/keyperformance" class="nav-item" active-class="active">Key Performance</router-link>
@@ -39,9 +39,9 @@
       <div class="mascot-container">
         <div class="mascot">⌨️</div>
       </div>
-      <button v-if="deviceStore.isPreview" @click="enterPreview" class="btn-authorize">进入预览</button>
+      <button v-if="deviceStore.isPreview" @click="enterPreview" class="btn-authorize">Enter Preview</button>
       <button v-else @click="openScanModal" class="btn-authorize">Authorize device +</button>
-      <div v-if="deviceStore.isPreview" class="preview-hint">预览模式不需要第三方 SDK 或设备授权</div>
+      <div v-if="deviceStore.isPreview" class="preview-hint">Preview mode does not require a third-party SDK or device authorization</div>
     </div>
 
     <!-- Device Selection Modal (Removed for cleaner UI) -->
@@ -56,7 +56,7 @@ import { useDeviceStore } from './stores/device';
 import { useLightingStore } from './stores/lighting';
 import { useErrorStore } from './stores/error';
 // DeviceModal removed
-import type { HHubDeviceInfo } from './types/device';
+import type { KeyboardDeviceInfo } from './types/device';
 import ErrorAlert from './components/common/ErrorAlert.vue';
 
 const router = useRouter();
@@ -93,7 +93,7 @@ const enterPreview = async () => {
   }
 };
 
-const handleConnect = async (device: HHubDeviceInfo) => {
+const handleConnect = async (device: KeyboardDeviceInfo) => {
   // Pass device ID to connect
   await deviceStore.connect(device.id);
   if (deviceStore.isConnected) {

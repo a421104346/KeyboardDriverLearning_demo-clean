@@ -112,12 +112,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
 import { useLightingStore } from '../../../stores/lighting';
 import ColorPicker from './ColorPicker.vue';
 
 const lightingStore = useLightingStore();
-const emit = defineEmits(['apply-all']);
+defineEmits(['apply-all']);
 
 const presets = [
   '#ff0000', '#ff8c00', // Red, Orange

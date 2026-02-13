@@ -1,4 +1,4 @@
-// Key code mapping extracted from H-Hub
+// Key code mapping for the keyboard project
 export const KEY_MAP: Record<number, string> = {
   // Special
   0: '',

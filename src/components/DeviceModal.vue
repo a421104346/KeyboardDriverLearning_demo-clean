@@ -23,10 +23,10 @@
 </template>
 
 <script setup lang="ts">
-import type { HHubDeviceInfo } from '../types/device';
+import type { KeyboardDeviceInfo } from '../types/device';
 
 defineProps<{
-  devices: HHubDeviceInfo[];
+  devices: KeyboardDeviceInfo[];
 }>();
 
 defineEmits(['close', 'connect', 'request']);

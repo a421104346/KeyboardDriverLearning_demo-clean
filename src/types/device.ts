@@ -5,31 +5,31 @@ export interface FeatureSet {
   macro: boolean;
 }
 
-export interface HHubDeviceInfo {
-  id: string; // 通常对应 productId 或 deviceId
+export interface KeyboardDeviceInfo {
+  id: string; // Usually maps to productId or deviceId
   name: string;
   vendorId: number;
   productId: number;
   serialNumber?: string;
-  version: string; // 固件版本
+  version: string; // Firmware version
   supportedFeatures: FeatureSet;
-  // 保留原始对象以备不时之需
+  // Keep original object for edge cases
   _raw?: any; 
 }
 
 export type DeviceConnectionState = 
-  | 'idle'           // 初始化
-  | 'authorizing'    // 等待用户授权 WebHID
-  | 'authorized'     // 已授权，未连接
-  | 'connecting'     // 正在连接
-  | 'connected'      // 已连接
-  | 'disconnecting'  // 正在断开
-  | 'error';         // 错误状态
+  | 'idle'           // Initial state
+  | 'authorizing'    // Waiting for WebHID user authorization
+  | 'authorized'     // Authorized but not connected
+  | 'connecting'     // Connecting
+  | 'connected'      // Connected
+  | 'disconnecting'  // Disconnecting
+  | 'error';         // Error state
 
 export interface DeviceState {
   state: DeviceConnectionState;
-  currentDevice: HHubDeviceInfo | null;
-  scannedDevices: HHubDeviceInfo[]; // 已授权/扫描到的设备列表
+  currentDevice: KeyboardDeviceInfo | null;
+  scannedDevices: KeyboardDeviceInfo[]; // List of authorized/scanned devices
   error: string | null;
 }
 
