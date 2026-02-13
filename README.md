@@ -3,7 +3,7 @@
 A web-based keyboard driver management panel built with Vue 3 + TypeScript.
 This repository is an internship project built for Morkblade, and supports both real WebHID devices and a built-in preview mode.
 
-> This public repository runs in **preview mode by default** (no private SDK required), so you can explore the full interface without physical hardware.
+> This public repository runs in preview mode by default (no private SDK required), so you can explore the full interface without physical hardware. The project was originally built during my internship at Morkblade.
 
 ## Features
 
